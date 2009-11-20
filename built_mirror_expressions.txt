@@ -8,3 +8,8 @@
 [[:send, [:literal, :string, "a"], :",", [:literal, :string, "b"]]]
 [[:send, [:literal, :string, "a"], :",", [:send, [:literal, :string, "b"], :*, [:literal, :integer, "3"]]]]
 [[:send, [:variable, "World"], [:mirrorInto, :as], [[:send, [:literal, :string, "Acc"], :",", [:literal, :string, "ount"]], [:send, [:literal, :string, "New"], :",", [:literal, :string, "Account"]]]]]
+[[:send, [:send, [:variable, "World"], :inspect], :inspect]]
+[[:send, [:variable, "World"], [:mirrorInto, :as], [[:send, [:literal, :string, "Acc"], :",", [:send, [:literal, :string, "ount"], :asString]], [:send, [:literal, :string, "New"], :",", [:literal, :string, "Account"]]]]]
+[[:send, [:send, [:literal, :integer, "2"], :asString], :",", [:send, [:literal, :integer, "3"], :asString]]]
+[[:send, [:send, [:literal, :integer, "2"], :asString], :",", [:literal, :string, "3"]]]
+[[:send, [:variable, "World"], [:mirrorInto], [[:send, [:send, [:literal, :string, "Account"], :inspect], :inspect]]]]

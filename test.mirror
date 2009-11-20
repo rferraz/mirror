@@ -3,7 +3,7 @@ World mirrorInto: #Account.
 Account set: #balance to: 0.
 Account set: #deposit to: [ 
   amount | 
-  balance = balance + amount 
+  balance become: balance + amount.
 ].
 
 Account set: #withdraw to: [

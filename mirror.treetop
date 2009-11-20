@@ -5,41 +5,39 @@ grammar Mirror
   end
   
   rule statement
-    message_expression /
-    primary
+    message_expression
   end
   
   rule message_expression
     keyword_expression /
-    binary_expression
+    binary_expression /
+    unary_expression
   end
   
   rule keyword_expression
-    variable:binary_object_description keywords:(spaces keyword spaces expression:binary_object_description)+ <KeywordExpression>
+    variable:binary_expression keywords:(spaces keyword spaces expression:binary_expression)+ <KeywordExpression>
   end
   
   rule binary_expression
-    variable:unary_object_description expressions:(spaces? selector:binary_selector spaces? expression:binary_object_description)+ <BinaryExpression>
+    variable:unary_expression expressions:(spaces? selector:binary_selector spaces? expression:binary_expression)+ <BinaryExpression> /
+    unary_expression
   end
   
-  rule keyword
-    identifier colon <Keyword>
-  end
-  
-  rule binary_object_description
-    binary_expression /
-    unary_object_description
-  end
-  
-  rule unary_object_description
-    primary
+  rule unary_expression
+     variable:primary selectors:(spaces selector:identifier !colon)+ <UnaryExpression> /
+     primary
   end
   
   rule binary_selector
     special_character+
   end
+
+  rule keyword
+    identifier colon <Keyword>
+  end
   
   rule primary
+    "(" spaces? message_expression spaces? ")" /
     variable /
     argument /
     literal

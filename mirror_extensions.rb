@@ -72,3 +72,20 @@ module BinaryExpression
   end
   
 end
+
+module UnaryExpression
+  
+  def build_sub_expression(variable, elements)
+    element = elements.shift
+    if element
+      [:send, build_sub_expression(variable, elements), element.selector.text_value.to_sym]
+    else
+      variable.build
+    end
+  end
+  
+  def build
+    build_sub_expression(variable, selectors.elements)
+  end
+  
+end
