@@ -1,7 +1,9 @@
 require "rubygems"
 require "treetop"
+
 require "lib/mirror"
 require "lib/mirror_extensions"
+require "lib/ast"
 
 # module Mirror
 #   

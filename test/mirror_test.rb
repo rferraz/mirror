@@ -18,7 +18,7 @@ class MirrorTest < Test::Unit::TestCase
   
   def test_building
     EXPRESSIONS.each_with_index do |line, i|
-      assert_equal eval(BUILT_EXPRESSIONS[i]), @parser.parse(line).build
+      assert_equal eval(BUILT_EXPRESSIONS[i]), @parser.parse(line).build.collect(&:to_sexp)
     end
   end
   

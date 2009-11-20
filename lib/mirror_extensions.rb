@@ -9,7 +9,7 @@ end
 module DecimalLiteral
   
   def build
-    [:literal, :decimal, text_value]
+    Ast::Literal.new(:decimal, text_value)
   end
   
 end
@@ -17,7 +17,7 @@ end
 module IntegerLiteral
   
   def build
-    [:literal, :integer, text_value]
+    Ast::Literal.new(:integer, text_value)
   end
   
 end
@@ -25,7 +25,7 @@ end
 module StringLiteral
   
   def build
-    [:literal, :string, text_value[1, text_value.size - 2].gsub("\"\"", "\"")]
+    Ast::Literal.new(:string, text_value[1, text_value.size - 2].gsub("\"\"", "\""))
   end
   
 end
@@ -33,7 +33,7 @@ end
 module Variable
   
   def build
-    [:variable, text_value]
+    Ast::Variable.new(text_value)
   end
   
 end
@@ -59,7 +59,7 @@ module KeywordExpression
   def build
     keyword_names = keywords.elements.collect(&:keyword).collect(&:build)
     parameter_values = keywords.elements.collect(&:expression).collect(&:build)
-    [:send, variable.build, keyword_names, parameter_values]
+    Ast::Message.new(variable.build, keyword_names, *parameter_values)
   end
   
 end
@@ -69,7 +69,7 @@ module BinaryExpression
   def build_sub_expression(variable, elements)
     element = elements.shift
     if element
-      [:send, variable.build, element.selector.text_value.to_sym, build_sub_expression(element.expression, elements)]
+      Ast::Message.new( variable.build, element.selector.text_value.to_sym, *build_sub_expression(element.expression, elements))
     else
       variable.build
     end
@@ -86,7 +86,7 @@ module UnaryExpression
   def build_sub_expression(variable, elements)
     element = elements.shift
     if element
-      [:send, build_sub_expression(variable, elements), element.selector.text_value.to_sym]
+      Ast::Message.new(build_sub_expression(variable, elements), element.selector.text_value.to_sym, *[])
     else
       variable.build
     end
@@ -106,7 +106,7 @@ module Block
     else
       argument_list = []
     end
-    [:block, argument_list, statements.build]
+    Ast::Block.new(argument_list, *statements.build)
   end
   
 end
