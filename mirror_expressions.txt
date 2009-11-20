@@ -4,3 +4,7 @@
 a.
 World mirrorInto: "Account".
 World mirrorInto: "Account" as: "NewAccount".
+1 + 2.
+"a" , "b".
+"a" , "b" * 3.
+World mirrorInto: "Acc" , "ount" as: "New" , "Account".

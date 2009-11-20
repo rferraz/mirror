@@ -10,11 +10,16 @@ grammar Mirror
   end
   
   rule message_expression
-    keyword_expression
+    keyword_expression /
+    binary_expression
   end
   
   rule keyword_expression
-    variable:binary_object_description keywords:(spaces keyword spaces expressions:binary_object_description)+ <KeywordExpression>
+    variable:binary_object_description keywords:(spaces keyword spaces expression:binary_object_description)+ <KeywordExpression>
+  end
+  
+  rule binary_expression
+    variable:unary_object_description expressions:(spaces? selector:binary_selector spaces? expression:binary_object_description)+ <BinaryExpression>
   end
   
   rule keyword
@@ -22,11 +27,16 @@ grammar Mirror
   end
   
   rule binary_object_description
+    binary_expression /
     unary_object_description
   end
   
   rule unary_object_description
     primary
+  end
+  
+  rule binary_selector
+    special_character+
   end
   
   rule primary
@@ -67,6 +77,10 @@ grammar Mirror
   
   rule identifier
     [a-zA-Z]+
+  end
+  
+  rule special_character
+    "+" / "-" / "*" / "/" / "\\" / "~" / "<" / ">" / "=" / "@" / "%" / "&" / "?" / "!" / ","
   end
   
   rule digit

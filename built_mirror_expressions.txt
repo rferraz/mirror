@@ -4,3 +4,7 @@
 [[:variable, "a"]]
 [[:send, [:variable, "World"], [:mirrorInto], [[:literal, :string, "Account"]]]]
 [[:send, [:variable, "World"], [:mirrorInto, :as], [[:literal, :string, "Account"], [:literal, :string, "NewAccount"]]]]
+[[:send, [:literal, :integer, "1"], :+, [:literal, :integer, "2"]]]
+[[:send, [:literal, :string, "a"], :",", [:literal, :string, "b"]]]
+[[:send, [:literal, :string, "a"], :",", [:send, [:literal, :string, "b"], :*, [:literal, :integer, "3"]]]]
+[[:send, [:variable, "World"], [:mirrorInto, :as], [[:send, [:literal, :string, "Acc"], :",", [:literal, :string, "ount"]], [:send, [:literal, :string, "New"], :",", [:literal, :string, "Account"]]]]]

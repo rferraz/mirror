@@ -50,8 +50,25 @@ module KeywordExpression
   
   def build
     keyword_names = keywords.elements.collect(&:keyword).collect(&:build)
-    parameter_values = keywords.elements.collect(&:expressions).collect(&:build)
+    parameter_values = keywords.elements.collect(&:expression).collect(&:build)
     [:send, variable.build, keyword_names, parameter_values]
+  end
+  
+end
+
+module BinaryExpression
+  
+  def build_sub_expression(variable, elements)
+    element = elements.shift
+    if element
+      [:send, variable.build, element.selector.text_value.to_sym, build_sub_expression(element.expression, elements)]
+    else
+      variable.build
+    end
+  end
+  
+  def build
+    build_sub_expression(variable, expressions.elements)
   end
   
 end
