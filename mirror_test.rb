@@ -15,11 +15,15 @@ class MirrorTest < Test::Unit::TestCase
       assert_not_nil @parser.parse(line)
     end
   end
-
+  
   def test_building
     EXPRESSIONS.each_with_index do |line, i|
       assert_equal eval(BUILT_EXPRESSIONS[i]), @parser.parse(line).build
     end
+  end
+  
+  def test_code
+    assert_not_nil @parser.parse(File.readlines("test.mirror").join)
   end
   
 end

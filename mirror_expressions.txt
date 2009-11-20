@@ -2,6 +2,9 @@
 1.1.
 "abc".
 a.
+[ a, b | a. ].
+[ a. ].
+[ a. 1 + 2. ].
 World mirrorInto: "Account".
 World mirrorInto: "Account" as: "NewAccount".
 1 + 2.
@@ -13,3 +16,4 @@ World mirrorInto: "Acc" , "ount" asString as: "New" , "Account".
 2 asString , 3 asString.
 2 asString , "3".
 World mirrorInto: "Account" inspect inspect.
+World mirrorInto: [ "New", "Account" asString. ] value.

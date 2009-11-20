@@ -1,14 +1,14 @@
-World mirrorInto: #Account.
+World mirrorInto: "Account".
 
-Account set: #balance to: 0.
-Account set: #deposit to: [ 
+Account set: "balance" to: 0.
+Account set: "deposit" to: [ 
   amount | 
   balance become: balance + amount.
 ].
 
-Account set: #withdraw to: [
+Account set: "withdraw" to: [
   amount |
-  (balance < amount) ifTrue: [ Error throw: "No funds!" ].
+  (balance < amount) ifTrue: [ Error throw: "No funds!". ].
   balance become: (balance - amount).
 ].
 

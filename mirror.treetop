@@ -38,9 +38,18 @@ grammar Mirror
   
   rule primary
     "(" spaces? message_expression spaces? ")" /
+    block /
     variable /
     argument /
     literal
+  end
+  
+  rule block
+    open_block spaces? arguments:(argument_list spaces? separator)? spaces? statements spaces? close_block <Block>
+  end
+  
+  rule argument_list
+    head:identifier tail:(spaces? comma spaces? identifier spaces?)* <Arguments>
   end
   
   rule variable
@@ -95,6 +104,22 @@ grammar Mirror
   
   rule colon
     ":"
+  end
+  
+  rule comma
+    ","
+  end
+  
+  rule open_block
+    "["
+  end
+    
+  rule close_block
+    "]"
+  end
+  
+  rule separator
+    "|"
   end
   
   rule spaces

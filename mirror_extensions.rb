@@ -89,3 +89,24 @@ module UnaryExpression
   end
   
 end
+
+module Block
+  
+  def build
+    if arguments.respond_to?(:argument_list)
+      argument_list = arguments.argument_list.build
+    else
+      argument_list = []
+    end
+    [:block, argument_list, statements.build]
+  end
+  
+end
+
+module Arguments
+  
+  def build
+    [head.text_value.to_sym] + tail.elements.collect(&:identifier).collect(&:text_value).collect(&:to_sym).flatten
+  end
+  
+end
