@@ -1,10 +1,10 @@
 require "test/unit"
-require "mirror_interpreter"
+require File.join(File.dirname(__FILE__), "..", "mirror_interpreter")
 
 class MirrorTest < Test::Unit::TestCase
   
-  EXPRESSIONS = File.readlines("mirror_expressions.txt")
-  BUILT_EXPRESSIONS = File.readlines("built_mirror_expressions.txt")
+  EXPRESSIONS = File.readlines(File.join(File.dirname(__FILE__), "mirror_expressions.txt"))
+  BUILT_EXPRESSIONS = File.readlines(File.join(File.dirname(__FILE__), "built_mirror_expressions.txt"))
 
   def setup
     @parser = MirrorParser.new
@@ -23,7 +23,7 @@ class MirrorTest < Test::Unit::TestCase
   end
   
   def test_code
-    assert_not_nil @parser.parse(File.readlines("test.mirror").join)
+    assert_not_nil @parser.parse(File.readlines(File.join(File.dirname(__FILE__), "test.mirror")).join)
   end
   
 end
