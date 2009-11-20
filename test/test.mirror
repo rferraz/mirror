@@ -12,6 +12,8 @@ Account set: "withdraw" to: [
   balance become: (balance - amount).
 ].
 
+Account mirrorInto: "account".
+
 account deposit: 100.
 account deposit: 200.
 
