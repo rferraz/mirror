@@ -1,0 +1,92 @@
+grammar Mirror
+
+  rule statements
+    (statement spaces? "." spaces?)* <Statements>
+  end
+  
+  rule statement
+    message_expression /
+    primary
+  end
+  
+  rule message_expression
+    keyword_expression
+  end
+  
+  rule keyword_expression
+    variable:binary_object_description keywords:(spaces keyword spaces expressions:binary_object_description)+ <KeywordExpression>
+  end
+  
+  rule keyword
+    identifier colon <Keyword>
+  end
+  
+  rule binary_object_description
+    unary_object_description
+  end
+  
+  rule unary_object_description
+    primary
+  end
+  
+  rule primary
+    variable /
+    argument /
+    literal
+  end
+  
+  rule variable
+    identifier <Variable>
+  end
+  
+  rule argument
+    identifier
+  end
+  
+  rule literal
+    numeric_literal /
+    string_literal
+  end
+  
+  rule numeric_literal
+    decimal /
+    integer
+  end
+  
+  rule decimal
+    integer period integer <DecimalLiteral>
+  end
+  
+  rule integer
+    digit+ <IntegerLiteral>
+  end
+    
+  rule string_literal
+    (quote (!quote .)* quote)+ <StringLiteral>
+  end
+  
+  rule identifier
+    [a-zA-Z]+
+  end
+  
+  rule digit
+    [0-9]
+  end
+
+  rule quote
+    "\""
+  end
+  
+  rule period
+    "."
+  end
+  
+  rule colon
+    ":"
+  end
+  
+  rule spaces
+    [\r\n\t\s]+
+  end
+
+end

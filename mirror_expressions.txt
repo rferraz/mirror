@@ -1,0 +1,6 @@
+1.
+1.1.
+"abc".
+a.
+World mirrorInto: "Account".
+World mirrorInto: "Account" as: "NewAccount".

@@ -1,0 +1,6 @@
+[[:literal, :integer, "1"]]
+[[:literal, :decimal, "1.1"]]
+[[:literal, :string, "abc"]]
+[[:variable, "a"]]
+[[:send, [:variable, "World"], [:mirrorInto], [[:literal, :string, "Account"]]]]
+[[:send, [:variable, "World"], [:mirrorInto, :as], [[:literal, :string, "Account"], [:literal, :string, "NewAccount"]]]]

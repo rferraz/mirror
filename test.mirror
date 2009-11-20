@@ -1,0 +1,20 @@
+World mirrorInto: #Account.
+
+Account set: #balance to: 0.
+Account set: #deposit to: [ 
+  amount | 
+  balance = balance + amount 
+].
+
+Account set: #withdraw to: [
+  amount |
+  (balance < amount) ifTrue: [ Error throw: "No funds!" ].
+  balance become: (balance - amount).
+].
+
+account deposit: 100.
+account deposit: 200.
+
+account withdraw: 20.
+
+account balance inspect.
