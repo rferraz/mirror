@@ -37,7 +37,7 @@ grammar Mirror
   end
   
   rule primary
-    "(" spaces? message_expression spaces? ")" /
+    "(" spaces? message_expression spaces? ")" <Primary> /
     block /
     variable /
     argument /

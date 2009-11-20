@@ -17,3 +17,8 @@
 [[:send, [:send, [:literal, :integer, "2"], :asString], :",", [:literal, :string, "3"]]]
 [[:send, [:variable, "World"], [:mirrorInto], [[:send, [:send, [:literal, :string, "Account"], :inspect], :inspect]]]]
 [[:send, [:variable, "World"], [:mirrorInto], [[:send, [:block, [], [[:send, [:literal, :string, "New"], :",", [:send, [:literal, :string, "Account"], :asString]]]], :value]]]]
+[[:send, [:variable, "World"], [:mirrorInto], [[:send, [:literal, :string, "New"], :",", [:literal, :string, "Account"]]]]]
+[[:send, [:variable, "World"], [:mirrorInto], [[:send, [:literal, :string, "New"], :",", [:literal, :string, "Account"]]]]]
+[[:send, [:send, [:literal, :integer, "1"], :+, [:literal, :integer, "2"]], :inspect]]
+[[:send, [:send, [:literal, :integer, "1"], :+, [:literal, :integer, "2"]], :*, [:literal, :integer, "3"]]]
+[[:send, [:literal, :integer, "1"], :+, [:send, [:literal, :integer, "2"], :*, [:literal, :integer, "3"]]]]

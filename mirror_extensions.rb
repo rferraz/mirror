@@ -46,6 +46,14 @@ module Keyword
   
 end
 
+module Primary
+  
+  def build
+    message_expression.build
+  end
+  
+end
+
 module KeywordExpression
   
   def build
