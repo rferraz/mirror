@@ -58,10 +58,10 @@ class CodeGenerator
   end
   
   def generate_message(ast)
-    generate_any(ast.target)
     ast.arguments.each do |item|
       generate_any(item)
     end
+    generate_any(ast.target)
     add_instruction(:send, ast.selector)
   end
   
