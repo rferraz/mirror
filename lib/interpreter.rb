@@ -5,9 +5,13 @@ class Interpreter
   end
   
   def run(code)
-    ast = MirrorParser.new.parse(code).build
-    instructions = CodeGenerator.new(ast).generate
-    VM.new(instructions).run
+    ast = @parser.parse(code)
+    if ast
+      instructions = CodeGenerator.new(ast.build).generate
+      VM.new(instructions).run
+    else
+      puts @parser.failure_reason
+    end
   end
   
   def self.run(code)

@@ -15,11 +15,7 @@ class SlotContainer < BlankObject
   end
   
   def [](name)
-    if name == "self"
-      self
-    else
-      @slots[name]
-    end
+    @slots[name]
   end
   
   def has?(name)

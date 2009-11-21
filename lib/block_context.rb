@@ -1,9 +1,13 @@
 class BlockContext < BlankObject
-  
+
   def initialize(vm, arguments, statements)
     @vm = vm
     @arguments = arguments
     @statements = statements
+  end
+  
+  def arity
+    @arguments.size
   end
   
   def value(*context_arguments)
@@ -28,7 +32,7 @@ class BlockContext < BlankObject
       vm.walk_contexts(name)[name]
     end
   end
-
+  
   def []=(name, value)
     if has?(name)
       context_arguments[name] = value

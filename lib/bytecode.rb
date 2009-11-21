@@ -9,7 +9,7 @@ module Bytecode
     end
     
     def inspect
-      "push #{@value}"
+      "push #{@value.inspect}"
     end
     
     def to_sexp

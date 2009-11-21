@@ -7,7 +7,7 @@ class Object
   def print
     $stdout.print(self)
   end
-
+  
   def print_ln
     $stdout.print(self)
     $stdout.print("\n")

@@ -5,12 +5,18 @@ class Proxy < BlankObject
     @delegate = delegate
   end
   
-  def method_missing(method, *args, &block)
-    if respond_to?(method)
-      __send__(method, *args, &block)
+  def method_missing(name, *args, &block)
+    if respond_to?(name)
+      __send__(name, *args, &block)
     else
-      @delegate.__send__(method, *args, &block)
+      @delegate.__send__(name, *args, &block)
     end
+  end
+  
+  def method(name)
+    @delegate.method(name)
+  rescue
+    super
   end
   
   def delegate

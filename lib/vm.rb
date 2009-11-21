@@ -64,9 +64,18 @@ class VM
     @contexts ||= [universe]
   end
   
+  def get_last_object_context
+    contexts.reverse.each do |context|
+      return context unless context.is_a?(BlockContext)
+    end
+    universe
+  end
+  
   def stack_push_and_wrap(value)
     if value.is_a?(TrueClass) || value.is_a?(FalseClass)
       stack.push(BooleanProxy.new(self, value))
+    elsif value.is_a?(Fixnum)
+      stack.push(FixnumProxy.new(self, value))
     else
       stack.push(value)
     end
@@ -77,7 +86,11 @@ class VM
     when Bytecode::Push
       stack_push_and_wrap(instruction.value)
     when Bytecode::Load
-      stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
+      if instruction.name == "self"
+        stack_push_and_wrap(current_context)
+      else
+        stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
+      end
     when Bytecode::Block
       stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.statements))
     when Bytecode::Message

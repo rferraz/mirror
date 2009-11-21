@@ -1,0 +1,24 @@
+World mirrorInto: "Bottles".
+
+Bottles set: "bottle" to: [
+  b |
+  ((b == 0) 
+    ifTrue: [ "No more bottles". ]
+    ifFalse: [
+      (b == 1)
+        ifTrue: [ "1 bottle". ]
+        ifFalse: [ (b asString) + " bottles". ].
+    ]) + " of beer".
+].
+
+Bottles set: "sing" to: [
+  99 downTo: 1 do: [
+    n |
+    ((self bottle: n) + " on the wall;") printLn.
+    ((self bottles: n) + ".") print.
+    "Take one down; pass it around:" printLn.
+    ((self bottle: n - 1) + " on the wall;") printLn.    
+  ].
+].
+
+Bottles sing.
