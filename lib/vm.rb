@@ -10,7 +10,7 @@ class VM
       execute(next_instruction)
     end
     stack.pop
-  rescue Exception => e
+  rescue MirrorError => e
     puts e.message
   end
 
@@ -35,7 +35,7 @@ class VM
   end
   
   def walk_contexts(name)
-    @contexts.reverse.each do |context|
+    contexts.reverse.each do |context|
       return context if context.has?(name)
     end
     universe
@@ -73,27 +73,17 @@ class VM
   end
   
   def execute(instruction)
-    type, argument = instruction
-    case type
-    when :push
-      stack_push_and_wrap(argument)
-    when :load
-      stack_push_and_wrap(current_context[argument])
-    when :block
-      block = BlockContext.new(self)
-      argument.first.each do |item|
-        block.add_argument(item.last)
-      end
-      argument.last.each do |item|
-        block.add_instruction(item)
-      end
-      stack_push_and_wrap(block)
-    when :send
-      message = [argument].flatten.collect(&:to_s).collect(&:underscore).join("_")
-      if message == "become"
-        name = stack.pop
-        value = stack.pop
-        current_context[name] = value
+    case instruction
+    when Bytecode::Push
+      stack_push_and_wrap(instruction.value)
+    when Bytecode::Load
+      stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
+    when Bytecode::Block
+      stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.statements))
+    when Bytecode::Message
+      message = instruction.selector
+      if message.to_sym == :become
+        current_context[stack.pop] = stack.pop
       else
         target = stack.pop
         parameters = []
@@ -101,7 +91,7 @@ class VM
           if target[message].is_a?(BlockContext)
             enter_context(target)
             begin
-              (argument.is_a?(Array) ? argument.size : 1).times { parameters.unshift(stack.pop) }
+              instruction.arity.times { parameters.unshift(stack.pop) }
               target[message].value(parameters)
             ensure
               leave_context
@@ -110,13 +100,12 @@ class VM
             stack_push_and_wrap(target[message])
           end
         else
-          message = "-" if message == "_"
           target.method(message).arity.times { parameters.unshift(stack.pop) }
           stack_push_and_wrap(target.send(message, *parameters))
         end
       end
     else
-      raise "Unknown instruction " + type.to_s
+      raise "Unknown instruction " + instruction.class.name.to_s
     end
   end
     

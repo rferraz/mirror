@@ -2,14 +2,10 @@ class CodeGenerator
   
   def initialize(ast)
     @ast = ast
-    @instructions = []
   end
 
   def generate
-    @ast.each do |item|
-      generate_any(item)
-    end
-    @instructions
+    @ast.collect { |statement| generate_any(statement) }.flatten
   end
   
   def method_missing(method, *args, &block)
@@ -22,10 +18,6 @@ class CodeGenerator
   
   protected
 
-  def add_instruction(*data)
-    @instructions << data
-  end
-  
   def generate_any(ast)
     send("generate_#{ast.class.name.demodulize.underscore}", ast)
   end
@@ -39,40 +31,47 @@ class CodeGenerator
     else
       ast.value
     end
-    add_instruction(:push, value)
+    Bytecode::Push.new(value)
   end
   
   def generate_variable(ast)
-    add_instruction(:load, ast.name)
+    Bytecode::Load.new(ast.name)
   end
   
   def generate_block(ast)
-    instructions = []
-    arguments = []
-    ast.arguments.each do |item|
-      arguments << [:argument, item]
-    end
-    pointer = @instructions.size
-    ast.statements.each do |item|
-      generate_any(item)
-    end
-    while @instructions.size != pointer
-      instructions.unshift(@instructions.pop)
-    end
-    add_instruction(:block, [arguments, instructions])
+    Bytecode::Block.new(ast.arguments, ast.statements.collect { |statement| generate_any(statement) }.flatten)
   end
   
   def generate_message(ast)
-    ast.arguments.each do |item|
-      generate_any(item)
+    instructions = []
+    ast.arguments.each do |argument|
+      instructions += [generate_any(argument)].flatten
     end
-    selector = [ast.selector].flatten
-    if selector.first == :become
-      add_instruction(:push, ast.target.name)
-      add_instruction(:send, selector)
+    if ast.selector == [:become]
+      instructions << Bytecode::Push.new(ast.target.name)
+      instructions << Bytecode::Message.new(:become, 1)
     else
-      generate_any(ast.target)
-      add_instruction(:send, selector)
+      instructions += [generate_any(ast.target)].flatten
+      instructions << Bytecode::Message.new(selector_name(ast.selector), selector_arity(ast.selector))
+    end
+    instructions
+  end
+  
+  protected
+  
+  def selector_arity(selector)
+    if selector.is_a?(Array)
+      selector.size
+    else
+      1
+    end
+  end
+  
+  def selector_name(selector)
+    if selector == :-
+      selector.to_s
+    else
+      [selector].flatten.collect(&:to_s).collect(&:underscore).join("_")
     end
   end
   

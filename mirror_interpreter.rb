@@ -14,6 +14,7 @@ require "lib/universe"
 require "lib/world"
 require "lib/error"
 require "lib/ast"
+require "lib/bytecode"
 require "lib/code_generator"
 require "lib/vm"
 
@@ -41,7 +42,7 @@ code = <<-EOF
 
   account withdraw: 120.
   
-  account balance inspect.
+  account balance printLn.
   
 EOF
 
@@ -49,4 +50,4 @@ ast = MirrorParser.new.parse(code).build
 
 instructions = CodeGenerator.new(ast).generate
 
-puts VM.new(instructions).run.inspect
+VM.new(instructions).run.inspect

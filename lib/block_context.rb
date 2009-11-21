@@ -1,25 +1,17 @@
 class BlockContext < BlankObject
   
-  def initialize(vm)
+  def initialize(vm, arguments, statements)
     @vm = vm
-    @arguments = []
-    @instructions = []
-  end
-  
-  def add_argument(argument)
-    @arguments << argument
-  end
-  
-  def add_instruction(instruction)
-    @instructions << instruction
+    @arguments = arguments
+    @statements = statements
   end
   
   def value(*context_arguments)
     reset_pointer
     reset_context_arguments(context_arguments)
     vm.enter_context(self)
-    while has_instructions?
-      vm.execute_in_current_context(next_instruction)
+    while has_statements?
+      vm.execute_in_current_context(next_statement)
     end
   ensure
     vm.leave_context
@@ -63,13 +55,13 @@ class BlockContext < BlankObject
     @pointer = 0
   end
 
-  def has_instructions?
-    @pointer < @instructions.size
+  def has_statements?
+    @pointer < @statements.size
   end
   
-  def next_instruction
+  def next_statement
     @pointer += 1
-    @instructions[@pointer - 1]
+    @statements[@pointer - 1]
   end
   
   def vm
