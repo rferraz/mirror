@@ -9,8 +9,8 @@ Account set: "deposit" to: [
 
 Account set: "withdraw" to: [
   amount |
-  (balance < amount) ifTrue: [ Error throw: "No funds!". ].
-  balance become: balance - amount.
+  (balance < amount) ifTrue: [ Error signal: "Insufficient funds! Amount drawn should be less than " + balance asString. ].
+  balance become: (balance - amount).
 ].
 
 Account mirrorInto: "account".
@@ -18,6 +18,6 @@ Account mirrorInto: "account".
 account deposit: 100.
 account deposit: 200.
 
-account withdraw: 20.
+account withdraw: 120.
 
 account balance inspect.

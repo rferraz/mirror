@@ -10,6 +10,8 @@ class VM
       execute(next_instruction)
     end
     stack.pop
+  rescue Exception => e
+    puts e.message
   end
 
   def universe
@@ -30,6 +32,13 @@ class VM
   
   def leave_context
     @contexts.pop
+  end
+  
+  def walk_contexts(name)
+    @contexts.reverse.each do |context|
+      return context if context.has?(name)
+    end
+    universe
   end
   
   protected
@@ -55,49 +64,55 @@ class VM
     @contexts ||= [universe]
   end
   
+  def stack_push_and_wrap(value)
+    if value.is_a?(TrueClass) || value.is_a?(FalseClass)
+      stack.push(BooleanProxy.new(self, value))
+    else
+      stack.push(value)
+    end
+  end
+  
   def execute(instruction)
     type, argument = instruction
     case type
     when :push
-      stack.push(argument)
+      stack_push_and_wrap(argument)
     when :load
-      stack.push(current_context[argument])
+      stack_push_and_wrap(current_context[argument])
     when :block
-      nesting = instruction.last
       block = BlockContext.new(self)
-      while ((instruction = next_instruction).first != :block) && (instruction.last != nesting)
-        type, argument = instruction
-        if type == :argument
-          block.add_argument(argument)
-        else
-          block.add_instruction(instruction)
-        end
+      argument.first.each do |item|
+        block.add_argument(item.last)
       end
-      stack.push(block)
+      argument.last.each do |item|
+        block.add_instruction(item)
+      end
+      stack_push_and_wrap(block)
     when :send
       message = [argument].flatten.collect(&:to_s).collect(&:underscore).join("_")
       if message == "become"
         name = stack.pop
         value = stack.pop
-        if current_context.is_a?(BlockContext)
-          current_context.world[name] = value
-        else
-          current_context[name] = value
-        end
+        current_context[name] = value
       else
         target = stack.pop
         parameters = []
         if target.is_a?(SlotContainer) && target.has?(message)
           if target[message].is_a?(BlockContext)
-            (argument.is_a?(Array) ? argument.size : 1).times { parameters.unshift(stack.pop) }
-            target[message].value(target, parameters)
+            enter_context(target)
+            begin
+              (argument.is_a?(Array) ? argument.size : 1).times { parameters.unshift(stack.pop) }
+              target[message].value(parameters)
+            ensure
+              leave_context
+            end
           else
-            stack.push(target[message])
+            stack_push_and_wrap(target[message])
           end
         else
           message = "-" if message == "_"
           target.method(message).arity.times { parameters.unshift(stack.pop) }
-          stack.push(target.send(message, *parameters))
+          stack_push_and_wrap(target.send(message, *parameters))
         end
       end
     else

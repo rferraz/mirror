@@ -1,8 +1,8 @@
 class SlotContainer < BlankObject
   
-  def initialize(vm)
+  def initialize(vm, slots = {})
     @vm = vm
-    @slots = {}
+    @slots = slots
   end
   
   def vm
@@ -28,6 +28,10 @@ class SlotContainer < BlankObject
   
   def []=(name, value)
     @slots[name] = value
+  end
+  
+  def inspect
+    @slots.inspect
   end
   
 end

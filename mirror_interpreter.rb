@@ -1,15 +1,18 @@
 require "rubygems"
 require "treetop"
-require "active_record"
+require "active_support"
 
+require "lib/extensions"
 require "lib/mirror"
 require "lib/mirror_extensions"
 require "lib/blank_object"
 require "lib/proxy"
+require "lib/boolean_proxy"
 require "lib/slot_container"
 require "lib/block_context"
 require "lib/universe"
 require "lib/world"
+require "lib/error"
 require "lib/ast"
 require "lib/code_generator"
 require "lib/vm"
@@ -27,6 +30,7 @@ code = <<-EOF
 
   Account set: "withdraw" to: [
     amount |
+    (balance < amount) ifTrue: [ Error signal: "Insufficient funds! Amount drawn should be less than " + balance asString. ].
     balance become: (balance - amount).
   ].
 
@@ -35,8 +39,8 @@ code = <<-EOF
   account deposit: 100.
   account deposit: 200.
 
-  account withdraw: 20.
-
+  account withdraw: 120.
+  
   account balance inspect.
   
 EOF
