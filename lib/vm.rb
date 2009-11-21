@@ -81,7 +81,7 @@ class VM
     when Bytecode::Block
       stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.statements))
     when Bytecode::Message
-      message = instruction.selector
+      message = instruction.selector_name
       if message.to_sym == :become
         current_context[stack.pop] = stack.pop
       else

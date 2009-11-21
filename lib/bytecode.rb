@@ -12,6 +12,10 @@ module Bytecode
       "push #{@value}"
     end
     
+    def to_sexp
+      [:push, @value]
+    end
+    
   end
   
   class Load 
@@ -26,6 +30,10 @@ module Bytecode
       "load #{@name}"
     end
     
+    def to_sexp
+      [:load, @name]
+    end
+        
   end
   
   class Block
@@ -42,23 +50,42 @@ module Bytecode
       "block #{@arguments.inspect}"
     end    
     
+    def to_sexp
+      [:block, @arguments, @statements.collect(&:to_sexp)]
+    end
+    
   end
   
   class Message
     
     attr_reader :arity
     attr_reader :selector
+    attr_reader :selector_name
     
     def initialize(selector, arity)
       @selector = selector
+      @selector_name = get_selector_name(selector)
       @arity = arity
     end
     
     def inspect
-      "send #{@selector}"
+      "send #{@selector_name}"
     end    
     
+    def to_sexp
+      [:send, @selector]
+    end
     
+    protected
+
+    def get_selector_name(selector)
+      if selector == :-
+        selector.to_s
+      else
+        [selector].flatten.collect(&:to_s).collect(&:underscore).join("_")
+      end
+    end
+
   end
   
 end

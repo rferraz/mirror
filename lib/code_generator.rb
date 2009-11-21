@@ -52,7 +52,7 @@ class CodeGenerator
       instructions << Bytecode::Message.new(:become, 1)
     else
       instructions += [generate_any(ast.target)].flatten
-      instructions << Bytecode::Message.new(selector_name(ast.selector), selector_arity(ast.selector))
+      instructions << Bytecode::Message.new(ast.selector, selector_arity(ast.selector))
     end
     instructions
   end
@@ -64,14 +64,6 @@ class CodeGenerator
       selector.size
     else
       1
-    end
-  end
-  
-  def selector_name(selector)
-    if selector == :-
-      selector.to_s
-    else
-      [selector].flatten.collect(&:to_s).collect(&:underscore).join("_")
     end
   end
   
