@@ -114,7 +114,7 @@ end
 module Arguments
   
   def build
-    [head.text_value.to_sym] + tail.elements.collect(&:identifier).collect(&:text_value).collect(&:to_sym).flatten
+    [head.text_value] + tail.elements.collect(&:identifier).collect(&:text_value).flatten
   end
   
 end

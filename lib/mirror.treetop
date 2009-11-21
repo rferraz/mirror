@@ -1,7 +1,7 @@
 grammar Mirror
 
   rule statements
-    (statement spaces? "." spaces?)* <Statements>
+    (spaces? statement spaces? "." spaces?)* <Statements>
   end
   
   rule statement

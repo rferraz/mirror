@@ -2,6 +2,9 @@ module Ast
   
   class Literal
     
+    attr_reader :type
+    attr_reader :value
+    
     def initialize(type, value)
       @type = type
       @value = value
@@ -15,6 +18,8 @@ module Ast
 
   class Variable
     
+    attr_accessor :name
+    
     def initialize(name)
       @name = name
     end
@@ -26,6 +31,9 @@ module Ast
   end
   
   class Block
+    
+    attr_reader :arguments
+    attr_reader :statements
     
     def initialize(arguments, *statements)
       @arguments = arguments
@@ -40,6 +48,10 @@ module Ast
 
   class Message
     
+    attr_reader :target
+    attr_reader :selector
+    attr_reader :arguments
+    
     def initialize(target, selector, *arguments)
       @target = target
       @selector = selector
@@ -49,7 +61,7 @@ module Ast
     def to_sexp
       [:send, @target.to_sexp, @selector, @arguments.collect(&:to_sexp)]
     end
-    
+        
   end
   
 end
