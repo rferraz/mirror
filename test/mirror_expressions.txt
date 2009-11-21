@@ -11,11 +11,11 @@ World mirrorInto: "Account" as: "NewAccount".
 "a" , "b".
 "a" , "b" * 3.
 World mirrorInto: "Acc" , "ount" as: "New" , "Account".
-World inspect inspect.
+World base inspect.
 World mirrorInto: "Acc" , "ount" asString as: "New" , "Account".
 2 asString , 3 asString.
 2 asString , "3".
-(World mirrorInto: "Account") inspect inspect.
+(World mirrorInto: "Account") base inspect.
 World mirrorInto: [ "New", "Account" asString. ] value.
 World mirrorInto: "New" , "Account".
 World mirrorInto: ("New" , "Account").

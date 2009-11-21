@@ -69,7 +69,7 @@ module BinaryExpression
   def build_sub_expression(variable, elements)
     element = elements.shift
     if element
-      Ast::Message.new( variable.build, element.selector.text_value.to_sym, *build_sub_expression(element.expression, elements))
+      Ast::Message.new(variable.build, element.selector.text_value.to_sym, *build_sub_expression(element.expression, elements))
     else
       variable.build
     end
@@ -93,7 +93,7 @@ module UnaryExpression
   end
   
   def build
-    build_sub_expression(variable, selectors.elements)
+    build_sub_expression(variable, selectors.elements.reverse)
   end
   
 end

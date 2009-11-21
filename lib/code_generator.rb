@@ -47,22 +47,39 @@ class CodeGenerator
   end
   
   def generate_block(ast)
-    add_instruction(:block, :start)
+    add_instruction(:block, :start, increase_block_nesting)
     ast.arguments.each do |item|
       add_instruction(:argument, item)
     end
     ast.statements.each do |item|
       generate_any(item)
     end
-    add_instruction(:block, :end)
+    add_instruction(:block, :end, decrease_block_nesting)
   end
   
   def generate_message(ast)
     ast.arguments.each do |item|
       generate_any(item)
     end
-    generate_any(ast.target)
-    add_instruction(:send, ast.selector)
+    selector = [ast.selector].flatten
+    if selector.first == :become
+      add_instruction(:push, ast.target.name)
+      add_instruction(:send, selector)
+    else
+      generate_any(ast.target)
+      add_instruction(:send, selector)
+    end
+  end
+  
+  def increase_block_nesting
+    @block_nesting ||= 0 
+    @old_block_nesting = @block_nesting
+    @block_nesting += 1
+    @old_block_nesting
+  end
+  
+  def decrease_block_nesting
+    @block_nesting -= 1
   end
   
 end
