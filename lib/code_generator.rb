@@ -44,7 +44,7 @@ class CodeGenerator
   
   def generate_message(ast)
     instructions = []
-    ast.arguments.each do |argument|
+    ast.arguments.reverse.each do |argument|
       instructions += [generate_any(argument)].flatten
     end
     if ast.selector == [:become]

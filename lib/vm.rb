@@ -104,7 +104,7 @@ class VM
           if target[message].is_a?(BlockContext)
             enter_context(target)
             begin
-              instruction.arity.times { parameters.unshift(stack.pop) }
+              instruction.arity.times { parameters.push(stack.pop) }
               target[message].value(parameters)
             ensure
               leave_context
@@ -113,7 +113,7 @@ class VM
             stack_push_and_wrap(target[message])
           end
         else
-          target.method(message).arity.times { parameters.unshift(stack.pop) }
+          target.method(message).arity.times { parameters.push(stack.pop) }
           stack_push_and_wrap(target.send(message, *parameters))
         end
       end

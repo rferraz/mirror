@@ -2,12 +2,12 @@ World mirrorInto: "Bottles".
 
 Bottles set: "bottle" to: [
   b |
-  ((b == 0) 
+  (b == 0
     ifTrue: [ "No more bottles". ]
     ifFalse: [
-      (b == 1)
+      b == 1
         ifTrue: [ "1 bottle". ]
-        ifFalse: [ (b asString) + " bottles". ].
+        ifFalse: [ b asString + " bottles". ].
     ]) + " of beer".
 ].
 
