@@ -1,5 +1,5 @@
 require "test/unit"
-require File.join(File.dirname(__FILE__), "..", "mirror_interpreter")
+require File.join(File.dirname(__FILE__), "..", "mirror")
 
 class MirrorTest < Test::Unit::TestCase
   
