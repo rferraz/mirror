@@ -83,44 +83,43 @@ class VM
   
   def execute(instruction)
     case instruction
+    when Bytecode::Implicit
+      stack_push_and_wrap(current_context)
     when Bytecode::Pop
       stack.pop
     when Bytecode::Push
       stack_push_and_wrap(instruction.value)
     when Bytecode::Load
-      if instruction.name == "self"
-        stack_push_and_wrap(current_context)
-      else
-        stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
-      end
+      stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
     when Bytecode::Block
       stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.statements))
     when Bytecode::Message
       message = instruction.selector_name
-      if message.to_sym == :become
-        current_context[stack.pop] = stack.pop
-      else
-        target = stack.pop
-        parameters = []
-        if target.is_a?(SlotContainer) && target.has?(message)
-          if target[message].is_a?(BlockContext)
-            enter_context(target)
-            begin
-              instruction.arity.times { parameters.push(stack.pop) }
-              target[message].value(parameters)
-            ensure
-              leave_context
-            end
-          else
-            stack_push_and_wrap(target[message])
+      target = stack.pop
+      parameters = []
+      if target.is_a?(SlotContainer) && target.has?(message)
+        if target[message].is_a?(BlockContext)
+          enter_context(target)
+          begin
+            instruction.arity.times { parameters.push(stack.pop) }
+            target[message].value(target, parameters)
+          ensure
+            leave_context
           end
         else
-          begin
+          stack_push_and_wrap(target[message])
+        end
+      else
+        begin
+          if target.is_a?(BlockContext)
+            target.arity.times { parameters.push(stack.pop) }
+            stack_push_and_wrap(target.send(message, *parameters))
+          else
             target.method(message).arity.times { parameters.push(stack.pop) }
             stack_push_and_wrap(target.send(message, *parameters))
-          rescue NameError, NoMethodError
-            raise MirrorError.new(target.inspect + " doesn't understand the message " + message)
           end
+        rescue NameError, NoMethodError
+          raise MirrorError.new(target.inspect + " doesn't understand the message " + message)
         end
       end
     else

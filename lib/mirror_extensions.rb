@@ -59,7 +59,8 @@ module KeywordExpression
   def build
     keyword_names = keywords.elements.collect(&:keyword).collect(&:build)
     parameter_values = keywords.elements.collect(&:expression).collect(&:build)
-    Ast::Message.new(variable.build, keyword_names, *parameter_values)
+    receiver = variable.respond_to?(:build) ? variable.build : Ast::Implicit.new
+    Ast::Message.new(receiver, keyword_names, *parameter_values)
   end
   
 end
@@ -106,6 +107,14 @@ module Arguments
   
   def build
     [head.text_value] + tail.elements.collect(&:identifier).collect(&:text_value).flatten
+  end
+  
+end
+
+module Self
+  
+  def build
+    Ast::Implicit.new
   end
   
 end

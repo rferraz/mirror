@@ -4,13 +4,13 @@ Account set: "balance" to: 0.
 
 Account set: "deposit" to: [ 
   amount | 
-  balance become: balance + amount.
+  balance: balance + amount.
 ].
 
 Account set: "withdraw" to: [
   amount |
   (balance < amount) ifTrue: [ Error signal: "Insufficient funds! Amount drawn should be less than " + balance asString. ].
-  balance become: (balance - amount).
+  balance: balance - amount.
 ].
 
 Account mirrorInto: "account".

@@ -47,14 +47,13 @@ class CodeGenerator
     ast.arguments.reverse.each do |argument|
       instructions += [generate_any(argument)].flatten
     end
-    if ast.selector == [:become]
-      instructions << Bytecode::Push.new(ast.target.name)
-      instructions << Bytecode::Message.new(:become, 1)
-    else
-      instructions += [generate_any(ast.target)].flatten
-      instructions << Bytecode::Message.new(ast.selector, selector_arity(ast.selector))
-    end
+    instructions += [generate_any(ast.target)].flatten
+    instructions << Bytecode::Message.new(ast.selector, selector_arity(ast.selector))
     instructions
+  end
+  
+  def generate_implicit(ast)
+    Bytecode::Implicit.new
   end
   
   def generate_statement(ast)

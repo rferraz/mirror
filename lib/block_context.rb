@@ -10,15 +10,24 @@ class BlockContext < BlankObject
     @arguments.size
   end
   
-  def value(*context_arguments)
-    reset_pointer
+  def value(receiver, *context_arguments)
+    reset_receiver(receiver)
     reset_context_arguments(context_arguments)
+    reset_pointer
     vm.enter_context(self)
     while has_statements?
       vm.execute_in_current_context(next_statement)
     end
   ensure
     vm.leave_context
+  end
+  
+  def method_missing(name, *args, &block)
+    if respond_to?(name)
+      super
+    else
+      receiver.perform(name, *args, &block)
+    end
   end
 
   def has?(name)
@@ -45,14 +54,22 @@ class BlockContext < BlankObject
     @context_arguments ||= {}
   end
   
+  def receiver
+    @receiver ||= self
+  end
+  
   def inspect
-    "<BlockContext: " + @arguments.join(",") + ">"
+    "<BlockContext: [" + @arguments.join(",") + "]>"
   end
 
   protected
   
   def reset_context_arguments(context_arguments)
     @context_arguments = Hash[*@arguments.zip(context_arguments).flatten]
+  end
+  
+  def reset_receiver(receiver)
+    @receiver = receiver
   end
   
   def reset_pointer

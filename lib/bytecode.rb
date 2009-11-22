@@ -1,4 +1,16 @@
 module Bytecode
+
+  class Implicit
+
+    def inspect
+      "implicit"
+    end
+    
+    def to_sexp
+      [:implicit]
+    end
+    
+  end
   
   class Pop
 

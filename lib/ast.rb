@@ -8,6 +8,14 @@ module Ast
       @expression = expression
     end
     
+    def to_sexp
+      @expression.to_sexp
+    end
+    
+  end
+  
+  class Implicit
+    
   end
   
   class Literal

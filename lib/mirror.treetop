@@ -15,7 +15,7 @@ grammar Mirror
   end
   
   rule keyword_expression
-    variable:binary_expression keywords:(spaces keyword spaces expression:binary_expression)+ <KeywordExpression>
+    variable:binary_expression? keywords:(spaces? keyword spaces expression:binary_expression)+ <KeywordExpression>
   end
   
   rule binary_expression
@@ -38,9 +38,9 @@ grammar Mirror
   
   rule primary
     "(" spaces? message_expression spaces? ")" <Primary> /
+    "self" <Self> /
     block /
     variable /
-    argument /
     literal
   end
   
@@ -53,7 +53,7 @@ grammar Mirror
   end
   
   rule variable
-    identifier <Variable>
+    identifier !colon <Variable>
   end
   
   rule argument
