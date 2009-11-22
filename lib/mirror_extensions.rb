@@ -1,7 +1,7 @@
 module Statements
 
   def build
-    elements.collect { |element| element.statement.build }
+    elements.collect { |element| Ast::Statement.new(element.statement.build) }
   end
   
 end
@@ -66,17 +66,8 @@ end
 
 module BinaryExpression
   
-  def build_sub_expression(variable, elements)
-    element = elements.shift
-    if element
-      Ast::Message.new(variable.build, element.selector.text_value.to_sym, *build_sub_expression(element.expression, elements))
-    else
-      variable.build
-    end
-  end
-  
   def build
-    build_sub_expression(variable, expressions.elements)
+    Ast::Message.new(variable.build, selector.text_value.to_sym, expression.build)
   end
   
 end

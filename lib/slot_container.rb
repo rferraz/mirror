@@ -1,7 +1,8 @@
 class SlotContainer < BlankObject
   
-  def initialize(vm, slots = {})
+  def initialize(vm, name, slots = {})
     @vm = vm
+    @name = name
     @slots = slots
   end
   
@@ -10,24 +11,24 @@ class SlotContainer < BlankObject
   end
   
   def set_to(name, value)
-    @slots[name] = value
-    @slots[name]
+    self[name] = value
   end
-  
+
+  def has?(name)
+    @slots.has_key?(name)
+  end
+    
   def [](name)
     @slots[name]
   end
   
-  def has?(name)
-    @slots.has_key?(name)
-  end
-  
   def []=(name, value)
     @slots[name] = value
+    @slots[name]
   end
   
   def inspect
-    @slots.inspect
+    "<" + @name + ": " + @slots.inspect + ">"
   end
   
 end

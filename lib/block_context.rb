@@ -46,7 +46,7 @@ class BlockContext < BlankObject
   end
   
   def inspect
-    "BlockContext"
+    "<BlockContext: " + @arguments.join(",") + ">"
   end
 
   protected

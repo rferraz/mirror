@@ -19,7 +19,7 @@ grammar Mirror
   end
   
   rule binary_expression
-    variable:unary_expression expressions:(spaces? selector:binary_selector spaces? expression:binary_expression)+ <BinaryExpression> /
+    variable:unary_expression spaces? selector:binary_selector spaces? expression:binary_expression <BinaryExpression> /
     unary_expression
   end
   

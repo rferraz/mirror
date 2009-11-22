@@ -1,5 +1,17 @@
 module Bytecode
   
+  class Pop
+
+    def inspect
+      "pop"
+    end
+    
+    def to_sexp
+      [:pop]
+    end
+    
+  end
+  
   class Push
     
     attr_reader :value

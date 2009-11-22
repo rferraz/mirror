@@ -1,4 +1,14 @@
 module Ast
+
+  class Statement
+    
+    attr_reader :expression
+    
+    def initialize(expression)
+      @expression = expression
+    end
+    
+  end
   
   class Literal
     

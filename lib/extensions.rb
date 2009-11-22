@@ -6,11 +6,13 @@ class Object
   
   def print
     $stdout.print(self)
+    self
   end
   
   def print_ln
     $stdout.print(self)
     $stdout.print("\n")
+    self
   end
   
 end

@@ -57,6 +57,10 @@ class CodeGenerator
     instructions
   end
   
+  def generate_statement(ast)
+    ([generate_any(ast.expression)] + [Bytecode::Pop.new]).flatten
+  end
+  
   protected
   
   def selector_arity(selector)

@@ -15,7 +15,7 @@ class VM
   end
 
   def universe
-    @universe ||= Universe.new(self)
+    @universe ||= Universe.new(self, "Universe")
   end
   
   def current_context
@@ -83,6 +83,8 @@ class VM
   
   def execute(instruction)
     case instruction
+    when Bytecode::Pop
+      stack.pop
     when Bytecode::Push
       stack_push_and_wrap(instruction.value)
     when Bytecode::Load
@@ -113,8 +115,12 @@ class VM
             stack_push_and_wrap(target[message])
           end
         else
-          target.method(message).arity.times { parameters.push(stack.pop) }
-          stack_push_and_wrap(target.send(message, *parameters))
+          begin
+            target.method(message).arity.times { parameters.push(stack.pop) }
+            stack_push_and_wrap(target.send(message, *parameters))
+          rescue NameError, NoMethodError
+            raise MirrorError.new(target.inspect + " doesn't understand the message " + message)
+          end
         end
       end
     else

@@ -1,9 +1,9 @@
 class Universe < SlotContainer
   
-  def initialize(vm)
+  def initialize(vm, name, slots = {})
     super
-    set_to("World", World.new(vm))
-    set_to("Error", Error.new(vm))
+    set_to("World", World.new(vm, "World"))
+    set_to("Error", Error.new(vm, "Error"))
   end
   
 end
