@@ -24,17 +24,18 @@ class BlockContext < BlankObject
   end
   
   def method_missing(name, *args, &block)
-    if is_unary?(name.to_s)
-      value = self[unary_name(name.to_s)]
-      if value
-        self[unary_name(name.to_s)] = args.first
-        return args.first
-      end
-    end
     if respond_to?(name)
       super
     else
-      receiver.perform(name.to_s, *args, &block)
+      if is_unary?(name.to_s)
+        if receiver.has?(name)
+          receiver.perform(name.to_s, *args, &block)
+        else
+          self[unary_name(name.to_s)] = args.first
+        end
+      else
+        receiver.perform(name.to_s, *args, &block)
+      end
     end
   end
 

@@ -115,7 +115,7 @@ class VM
           if target.is_a?(BlockContext)
             enter_context(target.receiver)
             begin
-              target.arity.times { parameters.push(stack.pop) }
+              instruction.arity.times { parameters.push(stack.pop) }
               stack_push_and_wrap(target.send(selector, *parameters))
             ensure
               leave_context
