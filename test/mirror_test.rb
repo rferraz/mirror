@@ -22,7 +22,7 @@ class MirrorTest < Test::Unit::TestCase
       assert_equal eval(BUILT_EXPRESSIONS[i]), @parser.parse(line).build.collect(&:to_sexp)
     end
   end
-
+  
   def test_generating
     EXPRESSIONS.each_with_index do |line, i|
       assert_equal eval(GENERATED_EXPRESSIONS[i]), CodeGenerator.new(@parser.parse(line).build).generate.collect(&:to_sexp)
