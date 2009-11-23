@@ -1,8 +1,9 @@
 class BlockContext < BlankObject
 
-  def initialize(vm, arguments, statements)
+  def initialize(vm, arguments, temporaries, statements)
     @vm = vm
-    @arguments = arguments
+    @arguments = arguments.collect(&:to_sym)
+    @temporaries = temporaries.collect(&:to_sym)
     @statements = statements
   end
   
@@ -10,9 +11,9 @@ class BlockContext < BlankObject
     @arguments.size
   end
   
-  def value(receiver, *context_arguments)
-    reset_receiver(receiver)
-    reset_context_arguments(context_arguments)
+  def value(*arguments)
+    reset_context_arguments(arguments)
+    reset_temporaries
     reset_pointer
     vm.enter_context(self)
     while has_statements?
@@ -23,20 +24,27 @@ class BlockContext < BlankObject
   end
   
   def method_missing(name, *args, &block)
+    if is_unary?(name.to_s)
+      value = self[unary_name(name.to_s)]
+      if value
+        self[unary_name(name.to_s)] = args.first
+        return args.first
+      end
+    end
     if respond_to?(name)
       super
     else
-      receiver.perform(name, *args, &block)
+      receiver.perform(name.to_s, *args, &block)
     end
   end
 
   def has?(name)
-    context_arguments.has_key?(name)
+    context_arguments.has_key?(name.to_sym)
   end
   
   def [](name)
     if has?(name)
-      context_arguments[name]
+      context_arguments[name.to_sym]
     else
       vm.walk_contexts(name)[name]
     end
@@ -44,7 +52,7 @@ class BlockContext < BlankObject
   
   def []=(name, value)
     if has?(name)
-      context_arguments[name] = value
+      context_arguments[name.to_sym] = value
     else
       vm.walk_contexts(name)[name] = value
     end
@@ -54,22 +62,34 @@ class BlockContext < BlankObject
     @context_arguments ||= {}
   end
   
-  def receiver
-    @receiver ||= self
+  def temporaries
+    @temporaries ||= {}
   end
   
   def inspect
-    "<BlockContext: [" + @arguments.join(",") + "]>"
+    "<BlockContext: [" + @arguments.join(",") + " : " + @temporaries.join(",") + " " + context_arguments.inspect + "]>"
+  end
+
+  def receiver
+    vm.get_last_object_context
   end
 
   protected
-  
-  def reset_context_arguments(context_arguments)
-    @context_arguments = Hash[*@arguments.zip(context_arguments).flatten]
+
+  def is_unary?(name)
+    name =~ /^[a-zA-z]/ && name.count(":") == 1
   end
   
-  def reset_receiver(receiver)
-    @receiver = receiver
+  def unary_name(name)
+    name[0, name.size - 1]
+  end
+    
+  def reset_context_arguments(incoming_arguments)
+    context_arguments.merge!(Hash[*@arguments.zip(incoming_arguments).flatten])
+  end
+  
+  def reset_temporaries
+    context_arguments.merge!(Hash[@temporaries.zip([:undefined] * @temporaries.size)])
   end
   
   def reset_pointer

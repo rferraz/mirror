@@ -41,7 +41,7 @@ end
 module Keyword
   
   def build
-    identifier.text_value.to_sym
+    text_value
   end
   
 end
@@ -68,7 +68,7 @@ end
 module BinaryExpression
   
   def build
-    Ast::Message.new(variable.build, selector.text_value.to_sym, expression.build)
+    Ast::Message.new(variable.build, selector.text_value, expression.build)
   end
   
 end
@@ -78,7 +78,7 @@ module UnaryExpression
   def build_sub_expression(variable, elements)
     element = elements.shift
     if element
-      Ast::Message.new(build_sub_expression(variable, elements), element.selector.text_value.to_sym, *[])
+      Ast::Message.new(build_sub_expression(variable, elements), element.selector.text_value, *[])
     else
       variable.build
     end
@@ -98,7 +98,16 @@ module Block
     else
       argument_list = []
     end
-    Ast::Block.new(argument_list, *statements.build)
+    if arguments.respond_to?(:temporaries)
+      if arguments.temporaries.respond_to?(:argument_list)
+        temporaries_list = arguments.temporaries.argument_list.build
+      else
+        temporaries_list = []
+      end
+    else
+      temporaries_list = []
+    end
+    Ast::Block.new(argument_list, temporaries_list, *statements.build)
   end
   
 end
@@ -106,15 +115,7 @@ end
 module Arguments
   
   def build
-    [head.text_value] + tail.elements.collect(&:identifier).collect(&:text_value).flatten
-  end
-  
-end
-
-module Self
-  
-  def build
-    Ast::Implicit.new
+    elements.collect(&:identifier).collect(&:text_value).flatten
   end
   
 end

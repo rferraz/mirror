@@ -41,6 +41,13 @@ class VM
     universe
   end
   
+  def get_last_object_context
+    contexts.reverse.each do |context|
+      return context unless context.is_a?(BlockContext)
+    end
+    universe
+  end
+    
   protected
   
   def reset_pointer
@@ -64,13 +71,6 @@ class VM
     @contexts ||= [universe]
   end
   
-  def get_last_object_context
-    contexts.reverse.each do |context|
-      return context unless context.is_a?(BlockContext)
-    end
-    universe
-  end
-  
   def stack_push_and_wrap(value)
     if value.is_a?(TrueClass) || value.is_a?(FalseClass)
       stack.push(BooleanProxy.new(self, value))
@@ -92,35 +92,41 @@ class VM
     when Bytecode::Load
       stack_push_and_wrap(walk_contexts(instruction.name)[instruction.name])
     when Bytecode::Block
-      stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.statements))
+      stack_push_and_wrap(BlockContext.new(self, instruction.arguments, instruction.temporaries, instruction.statements))
     when Bytecode::Message
-      message = instruction.selector_name
+      selector = instruction.selector_name
+      selector_method = instruction.selector_method
       target = stack.pop
       parameters = []
-      if target.is_a?(SlotContainer) && target.has?(message)
-        if target[message].is_a?(BlockContext)
+      if target.is_a?(SlotContainer) && target.has?(selector)
+        if target[selector].is_a?(BlockContext)
           enter_context(target)
           begin
             instruction.arity.times { parameters.push(stack.pop) }
-            target[message].value(target, parameters)
+            target[selector].value(parameters)
           ensure
             leave_context
           end
         else
-          stack_push_and_wrap(target[message])
+          stack_push_and_wrap(target[selector])
         end
       else
-        begin
+        #begin
           if target.is_a?(BlockContext)
-            target.arity.times { parameters.push(stack.pop) }
-            stack_push_and_wrap(target.send(message, *parameters))
+            enter_context(target.receiver)
+            begin
+              target.arity.times { parameters.push(stack.pop) }
+              stack_push_and_wrap(target.send(selector, *parameters))
+            ensure
+              leave_context
+            end
           else
-            target.method(message).arity.times { parameters.push(stack.pop) }
-            stack_push_and_wrap(target.send(message, *parameters))
+            target.method(selector_method).arity.times { parameters.push(stack.pop) }
+            stack_push_and_wrap(target.send(selector_method, *parameters))
           end
-        rescue NameError, NoMethodError
-          raise MirrorError.new(target.inspect + " doesn't understand the message " + message)
-        end
+        #rescue NameError, NoMethodError
+        #  raise MirrorError.new(target.inspect + " doesn't understand the message " + selector)
+        #end
       end
     else
       raise "Unknown instruction " + instruction.class.name.to_s

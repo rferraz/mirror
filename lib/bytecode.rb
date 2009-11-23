@@ -63,15 +63,17 @@ module Bytecode
   class Block
     
     attr_reader :arguments
+    attr_reader :temporaries
     attr_reader :statements
     
-    def initialize(arguments, statements)
+    def initialize(arguments, temporaries, statements)
       @arguments = arguments
+      @temporaries = temporaries
       @statements = statements
     end
     
     def inspect
-      "block #{@arguments.inspect}"
+      "block [#{@arguments.inspect} : #{@temporaries.inspect}]"
     end    
     
     def to_sexp
@@ -85,11 +87,13 @@ module Bytecode
     attr_reader :arity
     attr_reader :selector
     attr_reader :selector_name
+    attr_reader :selector_method
     
-    def initialize(selector, arity)
+    def initialize(selector)
       @selector = selector
       @selector_name = get_selector_name(selector)
-      @arity = arity
+      @selector_method = get_selector_method(selector)
+      @arity = get_selector_arity(selector)
     end
     
     def inspect
@@ -102,11 +106,33 @@ module Bytecode
     
     protected
 
+    def get_selector_arity(selector)
+      if selector.is_a?(Array)
+        selector.size
+      elsif selector.is_a?(String)
+        if selector[selector.size - 1].chr == ":"
+          1
+        else
+          0
+        end
+      else
+        1
+      end
+    end
+    
     def get_selector_name(selector)
       if selector == :-
         selector.to_s
       else
-        [selector].flatten.collect(&:to_s).collect(&:underscore).join("_")
+        [selector].flatten.collect(&:to_s).join
+      end
+    end
+
+    def get_selector_method(selector)
+      if selector == "-"
+        selector.to_s
+      else
+        [selector].flatten.collect(&:to_s).collect(&:underscore).join("_").gsub(":", "")
       end
     end
 

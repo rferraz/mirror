@@ -51,15 +51,17 @@ module Ast
   class Block
     
     attr_reader :arguments
+    attr_reader :temporaries
     attr_reader :statements
     
-    def initialize(arguments, *statements)
+    def initialize(arguments, temporaries, *statements)
+      @temporaries = temporaries
       @arguments = arguments
       @statements = statements
     end
     
     def to_sexp
-      [:block, @arguments, @statements.collect(&:to_sexp)]
+      [:block, @arguments, @temporaries, @statements.collect(&:to_sexp)]
     end
     
   end

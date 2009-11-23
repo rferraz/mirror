@@ -38,18 +38,23 @@ grammar Mirror
   
   rule primary
     "(" spaces? message_expression spaces? ")" <Primary> /
-    "self" <Self> /
     block /
     variable /
     literal
   end
   
   rule block
-    open_block spaces? arguments:(argument_list spaces? separator)? spaces? statements spaces? close_block <Block>
+    open_block 
+      spaces? 
+      arguments:(argument_list temporaries:(spaces? colon spaces? argument_list)? separator)? 
+      spaces? 
+      statements 
+      spaces? 
+      close_block <Block>
   end
   
   rule argument_list
-    head:identifier tail:(spaces? comma spaces? identifier spaces?)* <Arguments>
+    (identifier spaces?)+ <Arguments>
   end
   
   rule variable

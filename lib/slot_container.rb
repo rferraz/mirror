@@ -30,12 +30,14 @@ class SlotContainer < BlankObject
   def perform(message, *args)
     if has?(message)
       if self[message].is_a?(BlockContext)
-        self[message].value(self, *args)
+        self[message].value(*args)
       else
         self[message]
       end
+    elsif has?(single_message = message[0, message.size - 1])
+      self[single_message] = args.first
     else
-      raise MirrorError.new(target.inspect + " doesn't understand the message " + message)
+      raise MirrorError.new(self.inspect + " doesn't understand the message " + message)
     end
   end
   

@@ -39,7 +39,7 @@ class CodeGenerator
   end
   
   def generate_block(ast)
-    Bytecode::Block.new(ast.arguments, ast.statements.collect { |statement| generate_any(statement) }.flatten)
+    Bytecode::Block.new(ast.arguments, ast.temporaries, ast.statements.collect { |statement| generate_any(statement) }.flatten)
   end
   
   def generate_message(ast)
@@ -48,7 +48,7 @@ class CodeGenerator
       instructions += [generate_any(argument)].flatten
     end
     instructions += [generate_any(ast.target)].flatten
-    instructions << Bytecode::Message.new(ast.selector, selector_arity(ast.selector))
+    instructions << Bytecode::Message.new(ast.selector)
     instructions
   end
   
@@ -59,15 +59,5 @@ class CodeGenerator
   def generate_statement(ast)
     ([generate_any(ast.expression)] + [Bytecode::Pop.new]).flatten
   end
-  
-  protected
-  
-  def selector_arity(selector)
-    if selector.is_a?(Array)
-      selector.size
-    else
-      1
-    end
-  end
-  
+    
 end
