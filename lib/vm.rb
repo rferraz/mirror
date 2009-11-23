@@ -47,6 +47,10 @@ class VM
     end
     universe
   end
+
+  def stack
+    @stack ||= []
+  end
     
   protected
   
@@ -61,10 +65,6 @@ class VM
   def next_instruction
     @pointer += 1
     @instructions[@pointer - 1]
-  end
-  
-  def stack
-    @stack ||= []
   end
   
   def contexts
@@ -103,7 +103,7 @@ class VM
           enter_context(target)
           begin
             instruction.arity.times { parameters.push(stack.pop) }
-            target[selector].value(parameters)
+            stack_push_and_wrap(target[selector].value(parameters))
           ensure
             leave_context
           end
@@ -111,7 +111,7 @@ class VM
           stack_push_and_wrap(target[selector])
         end
       else
-        #begin
+        begin
           if target.is_a?(BlockContext)
             enter_context(target.receiver)
             begin
@@ -124,9 +124,9 @@ class VM
             target.method(selector_method).arity.times { parameters.push(stack.pop) }
             stack_push_and_wrap(target.send(selector_method, *parameters))
           end
-        #rescue NameError, NoMethodError
-        #  raise MirrorError.new(target.inspect + " doesn't understand the message " + selector)
-        #end
+        rescue NameError, NoMethodError
+          raise MirrorError.new(target.inspect + " doesn't understand the message " + selector)
+        end
       end
     else
       raise "Unknown instruction " + instruction.class.name.to_s

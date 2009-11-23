@@ -12,13 +12,18 @@ class BlockContext < BlankObject
   end
   
   def value(*arguments)
+    return_value = receiver
     reset_context_arguments(arguments)
     reset_temporaries
     reset_pointer
     vm.enter_context(self)
     while has_statements?
+      if is_last_statement?
+        return_value = vm.stack.last unless vm.stack.last.nil?
+      end
       vm.execute_in_current_context(next_statement)
     end
+    return_value
   ensure
     vm.leave_context
   end
@@ -90,13 +95,17 @@ class BlockContext < BlankObject
   end
   
   def reset_temporaries
-    context_arguments.merge!(Hash[@temporaries.zip([:undefined] * @temporaries.size)])
+    context_arguments.merge!(Hash[@temporaries.zip([nil] * @temporaries.size)])
   end
   
   def reset_pointer
     @pointer = 0
   end
 
+  def is_last_statement?
+    @pointer == @statements.size - 1
+  end
+  
   def has_statements?
     @pointer < @statements.size
   end
