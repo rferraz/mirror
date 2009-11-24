@@ -1,0 +1,10 @@
+World mirrorInto: "Fib".
+
+Fib set: "of:" to: [
+  n |
+  (n < 2)
+    ifTrue: [ 1. ]
+    ifFalse: [ (of: n - 1) + (of: n - 2). ].
+].
+
+(Fib of: 2) printLn.
