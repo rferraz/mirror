@@ -1,21 +1,18 @@
 World mirrorInto: "Fib".
 
-Fib set: "of:" to: [
-  n |
-  n <= 2
+Fib set: "of:" to: [ n |
+  n < 3
     ifTrue: [ 1. ]
     ifFalse: [ (of: n - 1) + (of: n - 2). ].
 ].
 
-Fib set: "iterativeOf:" to: [
-  n : a b |
-  n <= 2
+Fib set: "iterativeOf:" to: [ n |
+  n < 1
 		ifTrue: [ 1. ]
-		ifFalse: [
-			a: 1.
+		ifFalse: [ : a b |
+			a: 0.
 			b: 1.
-			1 to: n do: [
-				i : t |
+			2 to: n do: [ i : t |
 				t: b.
 				b: a + b.
 				a: t.
@@ -24,4 +21,4 @@ Fib set: "iterativeOf:" to: [
 		].
 ].
 
-(Fib iterativeOf: 10) printLn.
+(Fib iterativeOf: 1000) printLn.

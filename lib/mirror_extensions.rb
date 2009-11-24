@@ -93,19 +93,16 @@ end
 module Block
   
   def build
-    if arguments.respond_to?(:argument_list)
-      argument_list = arguments.argument_list.build
-    else
-      argument_list = []
-    end
-    if arguments.respond_to?(:temporaries)
-      if arguments.temporaries.respond_to?(:argument_list)
-        temporaries_list = arguments.temporaries.argument_list.build
-      else
-        temporaries_list = []
+    argument_list, temporaries_list = [], []
+    if parameters.respond_to?(:arguments)
+      if parameters.arguments.respond_to?(:build)
+        argument_list = parameters.arguments.build
       end
-    else
-      temporaries_list = []
+    end
+    if parameters.respond_to?(:temporaries)
+      if parameters.temporaries.respond_to?(:list)
+        temporaries_list = parameters.temporaries.list.build
+      end
     end
     Ast::Block.new(argument_list, temporaries_list, *statements.build)
   end

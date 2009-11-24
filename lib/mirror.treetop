@@ -46,7 +46,7 @@ grammar Mirror
   rule block
     open_block 
       spaces? 
-      arguments:(argument_list temporaries:(spaces? colon spaces? argument_list)? separator)? 
+      parameters:(arguments:argument_list? temporaries:(spaces? colon spaces? list:argument_list)? separator)? 
       spaces? 
       statements 
       spaces? 
