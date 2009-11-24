@@ -4,5 +4,10 @@ class FixnumProxy < Proxy
     self.downto(lower_bound) { |i| block.value(i) }
     self
   end
+
+  def to_do(upper_bound, block)
+    self.upto(upper_bound) { |i| block.value(i) }
+    self
+  end
   
 end

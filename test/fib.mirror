@@ -2,9 +2,26 @@ World mirrorInto: "Fib".
 
 Fib set: "of:" to: [
   n |
-  (n < 2)
+  n <= 2
     ifTrue: [ 1. ]
     ifFalse: [ (of: n - 1) + (of: n - 2). ].
 ].
 
-(Fib of: 10) printLn.
+Fib set: "iterativeOf:" to: [
+  n : a b |
+  n <= 2
+		ifTrue: [ 1. ]
+		ifFalse: [
+			a: 1.
+			b: 1.
+			1 to: n do: [
+				i : t |
+				t: b.
+				b: a + b.
+				a: t.
+			].
+			b.
+		].
+].
+
+(Fib iterativeOf: 10) printLn.
