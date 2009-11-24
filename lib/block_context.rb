@@ -7,6 +7,10 @@ class BlockContext < BlankObject
     @statements = statements
   end
   
+  def copy
+    BlockContext.new(@vm, @arguments, @temporaries, @statements)
+  end
+  
   def arity
     @arguments.size
   end

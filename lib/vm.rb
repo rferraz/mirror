@@ -103,7 +103,7 @@ class VM
           enter_context(target)
           begin
             instruction.arity.times { parameters.push(stack.pop) }
-            stack_push_and_wrap(target[selector].value(parameters))
+            stack_push_and_wrap(target[selector].copy.value(parameters))
           ensure
             leave_context
           end
@@ -116,7 +116,7 @@ class VM
             enter_context(target.receiver)
             begin
               instruction.arity.times { parameters.push(stack.pop) }
-              stack_push_and_wrap(target.send(selector, *parameters))
+              stack_push_and_wrap(target.copy.send(selector, *parameters))
             ensure
               leave_context
             end

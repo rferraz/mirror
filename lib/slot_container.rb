@@ -30,7 +30,7 @@ class SlotContainer < BlankObject
   def perform(message, *args)
     if has?(message)
       if self[message].is_a?(BlockContext)
-        self[message].value(*args)
+        self[message].copy.value(*args)
       else
         self[message]
       end

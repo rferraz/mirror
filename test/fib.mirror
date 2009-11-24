@@ -7,4 +7,4 @@ Fib set: "of:" to: [
     ifFalse: [ (of: n - 1) + (of: n - 2). ].
 ].
 
-(Fib of: 2) printLn.
+(Fib of: 10) printLn.
