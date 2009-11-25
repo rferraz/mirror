@@ -1,0 +1,20 @@
+World mirrorInto: "Point".
+
+Point set: "x" to: 0.
+Point set: "y" to: 0.
+
+Point set: "crossProductWith:and:" to: [ pa pb |
+  ((pa x - x) * (pb y - y)) -  ((pb x - x) * (pa y -y)).
+].
+
+Point set: "distanceFrom:" to: [ p |
+  (((x - p x) ^ 2) + ((y - p y) ^ 2)) sqrt.
+].
+
+Point set: "compareCrossProductWith:and:" to: [ pa pb : angle distance |
+  angle: (crossProductWith: pa and: pb) compareTo: 0.
+  distance: (distanceFrom: pa) compareTo: (distanceFrom: pb).
+  angle == "eq"
+    ifTrue: [ distance. ]
+    ifFalse: [ angle. ].
+].
