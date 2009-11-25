@@ -6,7 +6,12 @@ class World < SlotContainer
 
   def mirror_into_with(name, block)
     object = vm.universe.set_to(name, World.new(vm, name, @slots.dup))
-    block.value(object)
+    vm.enter_context(object)
+    begin
+      block.value
+    ensure
+      vm.leave_context
+    end
     object
   end
   

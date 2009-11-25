@@ -1,6 +1,7 @@
-# ["gt"]
+# ["right"]
 
 World mirrorInto: "Point".
+World mirrorInto: "Graham".
 
 Point set: "x" to: 0.
 Point set: "y" to: 0.
@@ -21,10 +22,19 @@ Point set: "compareCrossProductWith:and:" to: [ pa pb : angle distance |
     ifFalse: [ angle. ].
 ].
 
-Point mirrorInto: "pa" with: [ p | p x: 1. p y: 1. ].
-Point mirrorInto: "pb" with: [ p | p x: 3. p y: 5. ].
-Point mirrorInto: "pc" with: [ p | p x: 1. p y: 2. ].
+Graham set: "directionFrom:to:and:" to: [ pa pb pc : cp |
+	cp: (pa crossProductWith: pb and: pc).
+	cp > 0
+		ifTrue: [ "right". ]
+		ifFalse: [
+			cp < 0
+				ifTrue: [ "left". ]
+				ifFalse: [ "straight". ].
+		].
+].
 
-(World offload: (pa compareCrossProductWith: pb and: pc)) transcribeAndBreak.
+Point mirrorInto: "pa" with: [ x: 1. y: 1. ].
+Point mirrorInto: "pb" with: [ x: 3. y: 5. ].
+Point mirrorInto: "pc" with: [ x: 1. y: 2. ].
 
-
+(World offload: (Graham directionFrom: pa to: pb and: pc)) transcribeAndBreak.
