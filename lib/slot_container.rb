@@ -34,8 +34,9 @@ class SlotContainer < BlankObject
       else
         self[message]
       end
-    elsif has?(single_message = message[0, message.size - 1])
-      self[single_message] = args.first
+    elsif has?(unary_name(message.to_s))
+      self[unary_name(message.to_s)] = args.first
+      self[unary_name(message.to_s)]
     else
       raise MirrorError.new(self.inspect + " doesn't understand the message " + message)
     end
@@ -43,6 +44,14 @@ class SlotContainer < BlankObject
   
   def inspect
     "<" + @name + ": " + @slots.inspect + ">"
+  end
+  
+  def is_unary?(name)
+    name =~ /^[a-zA-z]/ && name.count(":") == 1
+  end
+  
+  def unary_name(name)
+    name[0, name.size - 1]
   end
   
 end

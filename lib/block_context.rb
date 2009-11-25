@@ -36,11 +36,11 @@ class BlockContext < BlankObject
     if respond_to?(name)
       super
     else
-      if is_unary?(name.to_s)
+      if receiver.is_unary?(name.to_s)
         if receiver.has?(name)
           receiver.perform(name.to_s, *args, &block)
         else
-          self[unary_name(name.to_s)] = args.first
+          self[receiver.unary_name(name.to_s)] = args.first
         end
       else
         receiver.perform(name.to_s, *args, &block)
@@ -86,16 +86,8 @@ class BlockContext < BlankObject
 
   protected
 
-  def is_unary?(name)
-    name =~ /^[a-zA-z]/ && name.count(":") == 1
-  end
-  
-  def unary_name(name)
-    name[0, name.size - 1]
-  end
-    
-  def reset_context_arguments(incoming_arguments)
-    context_arguments.merge!(Hash[*@arguments.zip(incoming_arguments).flatten])
+  def reset_context_arguments(*incoming_arguments)
+    context_arguments.merge!(Hash[*@arguments.zip([incoming_arguments].flatten).flatten])
   end
   
   def reset_temporaries

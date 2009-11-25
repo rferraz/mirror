@@ -98,17 +98,24 @@ class VM
       selector_method = instruction.selector_method
       target = stack.pop
       parameters = []
-      if target.is_a?(SlotContainer) && target.has?(selector)
-        if target[selector].is_a?(BlockContext)
-          enter_context(target)
-          begin
-            instruction.arity.times { parameters.push(stack.pop) }
-            stack_push_and_wrap(target[selector].copy.value(parameters))
-          ensure
-            leave_context
+      if target.is_a?(SlotContainer)
+        if target.has?(selector)
+          if target[selector].is_a?(BlockContext)
+            enter_context(target)
+            begin
+              instruction.arity.times { parameters.push(stack.pop) }
+              stack_push_and_wrap(target[selector].copy.value(parameters))
+            ensure
+              leave_context
+            end
+          else
+            stack_push_and_wrap(target[selector])
           end
+        elsif target.is_unary?(selector) && target.has?(target.unary_name(selector))
+          target[target.unary_name(selector)] = stack.last
         else
-          stack_push_and_wrap(target[selector])
+          target.method(selector_method).arity.times { parameters.push(stack.pop) }
+          stack_push_and_wrap(target.send(selector_method, *parameters))
         end
       else
         begin
