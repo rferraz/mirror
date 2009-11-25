@@ -76,6 +76,8 @@ class VM
       stack.push(BooleanProxy.new(self, value))
     elsif value.is_a?(Fixnum)
       stack.push(FixnumProxy.new(self, value))
+    elsif value.is_a?(Float)
+      stack.push(FloatProxy.new(self, value))
     else
       stack.push(value)
     end
