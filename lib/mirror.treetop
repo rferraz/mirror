@@ -128,7 +128,15 @@ grammar Mirror
   end
   
   rule spaces
-    [\r\n\t\s]+
+    space* ("#" (!break .)* break+ space*)*
+  end
+  
+  rule space
+    [\r\n\t\s]
+  end
+  
+  rule break
+    [\r\n]
   end
 
 end
