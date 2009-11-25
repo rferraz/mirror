@@ -1,3 +1,5 @@
+# [280]
+
 World mirrorInto: "Account".
 
 Account set: "balance" to: 0.
@@ -20,4 +22,4 @@ account deposit: 200.
 
 account withdraw: 20.
 
-account balance printLn.
+(World offload: account balance) transcribeAndBreak.

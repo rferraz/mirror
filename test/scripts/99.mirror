@@ -1,3 +1,5 @@
+# ["No more bottles of beer"]
+
 World mirrorInto: "Bottles".
 
 Bottles set: "bottle:" to: [
@@ -15,11 +17,13 @@ Bottles set: "bottle:" to: [
 Bottles set: "sing" to: [
   99 downTo: 1 do: [
     n |
-    ((bottle: n) + " on the wall; ") print.
-    ((bottle: n) + ". ") printLn.
-    "Take one down; pass it around. " print.
-    ((bottle: n - 1) + " on the wall.") printLn.    
+    ((bottle: n) + " on the wall; ") transcribe.
+    ((bottle: n) + ". ") transcribeAndBreak.
+    "Take one down; pass it around. " transcribe.
+    ((bottle: n - 1) + " on the wall.") transcribeAndBreak.    
   ].
 ].
 
 Bottles sing.
+
+World offload: (Bottles bottle: 0).

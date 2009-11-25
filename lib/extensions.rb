@@ -4,12 +4,12 @@ class Object
     to_s
   end
   
-  def print
+  def transcribe
     $stdout.print(self)
     self
   end
   
-  def print_ln
+  def transcribe_and_break
     $stdout.print(self)
     $stdout.print("\n")
     self

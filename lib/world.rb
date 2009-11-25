@@ -10,4 +10,9 @@ class World < SlotContainer
     object
   end
   
+  def offload(value)
+    vm.universe.offload(value)
+    value
+  end
+  
 end

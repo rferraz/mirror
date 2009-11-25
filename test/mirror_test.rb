@@ -1,8 +1,20 @@
 require "test/unit"
 require File.join(File.dirname(__FILE__), "..", "mirror")
 
-class MirrorTest < Test::Unit::TestCase
+class Object
   
+  def transcribe
+    self
+  end
+  
+  def transcribe_and_break
+    self
+  end
+  
+end
+
+class MirrorTest < Test::Unit::TestCase
+
   EXPRESSIONS = File.readlines(File.join(File.dirname(__FILE__), "mirror_expressions.txt"))
   BUILT_EXPRESSIONS = File.readlines(File.join(File.dirname(__FILE__), "built_mirror_expressions.txt"))
   GENERATED_EXPRESSIONS = File.readlines(File.join(File.dirname(__FILE__), "generated_mirror_expressions.txt"))
@@ -30,7 +42,11 @@ class MirrorTest < Test::Unit::TestCase
   end
   
   def test_code
-    assert_not_nil @parser.parse(File.readlines(File.join(File.dirname(__FILE__), "test.mirror")).join)
+    Dir[File.join(File.dirname(__FILE__), "scripts", "*.mirror")].each do |name|
+      lines = File.readlines(name)
+      expected = eval(lines.shift.gsub(/^#\s*/, ""))
+      assert_equal expected, Interpreter.run(false, lines.join)
+    end
   end
     
 end

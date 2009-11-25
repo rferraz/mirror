@@ -1,6 +1,7 @@
 class Interpreter
   
-  def initialize
+  def initialize(standalone)
+    @standalone = standalone
     @parser = MirrorParser.new
   end
   
@@ -8,14 +9,16 @@ class Interpreter
     ast = @parser.parse(code)
     if ast
       instructions = CodeGenerator.new(ast.build).generate
-      VM.new(instructions).run
+      vm = VM.new(instructions)
+      vm.run
+      vm.offloads
     else
       puts @parser.failure_reason
     end
   end
   
-  def self.run(code)
-    new.run(code)
+  def self.run(standalone, code)
+    new(standalone).run(code)
   end
   
 end

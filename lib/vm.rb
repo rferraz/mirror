@@ -18,6 +18,10 @@ class VM
     @universe ||= Universe.new(self, "Universe")
   end
   
+  def offloads
+    @universe.offloads
+  end
+  
   def current_context
     contexts.last
   end

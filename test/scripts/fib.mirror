@@ -1,3 +1,5 @@
+# [55]
+
 World mirrorInto: "Fib".
 
 Fib set: "of:" to: [ n |
@@ -21,4 +23,4 @@ Fib set: "iterativeOf:" to: [ n |
 		].
 ].
 
-(Fib iterativeOf: 1000) printLn.
+(World offload: (Fib iterativeOf: 10)) transcribeAndBreak.

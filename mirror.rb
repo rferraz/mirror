@@ -4,5 +4,5 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 require "lib/mirror"
 
 if $0 == __FILE__
-  Interpreter.run(ARGF.read)
+  Interpreter.run(true, ARGF.read)
 end

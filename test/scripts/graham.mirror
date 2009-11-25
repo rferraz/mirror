@@ -1,3 +1,5 @@
+# ["gt"]
+
 World mirrorInto: "Point".
 
 Point set: "x" to: 0.
@@ -23,6 +25,6 @@ Point mirrorInto: "pa" with: [ p | p x: 1. p y: 1. ].
 Point mirrorInto: "pb" with: [ p | p x: 3. p y: 5. ].
 Point mirrorInto: "pc" with: [ p | p x: 1. p y: 2. ].
 
-(pa compareCrossProductWith: pb and: pc) printLn.
+(World offload: (pa compareCrossProductWith: pb and: pc)) transcribeAndBreak.
 
 
