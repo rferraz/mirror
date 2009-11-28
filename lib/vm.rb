@@ -19,7 +19,7 @@ class VM
   end
   
   def offloads
-    @universe.offloads
+    universe.offloads
   end
   
   def current_context
