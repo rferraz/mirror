@@ -2,15 +2,15 @@
 
 Mirror is a toy language I wrote in a couple hours to demonstrate a few tools and concepts in a presentation I gave in a local event in Brazil. It has a syntax inspired by [Smalltalk][1] and semantics inspired by [Self][2] and [IO][3] as seen in the example below:
 
-  World mirrorInto: "Fib".
+    World mirrorInto: "Fib".
 
-  Fib set: "of:" to: [ n |
-    n < 3
-      ifTrue: [ 1. ]
-      ifFalse: [ (of: n - 1) + (of: n - 2). ].
-  ].
+    Fib set: "of:" to: [ n |
+      n < 3
+        ifTrue: [ 1. ]
+        ifFalse: [ (of: n - 1) + (of: n - 2). ].
+    ].
 
-  (Fib of: 10) transcribeAndBreak.
+    (Fib of: 10) transcribeAndBreak.
   
 # A few more details
 
@@ -29,8 +29,8 @@ Mirror is a toy language I wrote in a couple hours to demonstrate a few tools an
 
   Usage is pretty simple:
 
-  $ ruby mirror.rb test.mirror
-  $ echo "[ 2 + 2. ] transcribeAndBreak." | ruby mirror.rb
+    $ ruby mirror.rb test.mirror
+    $ echo "[ 2 + 2. ] transcribeAndBreak." | ruby mirror.rb
   
 # Tests
 
