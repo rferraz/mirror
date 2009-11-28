@@ -30,7 +30,7 @@ Mirror is a toy language I wrote in a couple hours to demonstrate a few tools an
   Usage is pretty simple:
 
     $ ruby mirror.rb test.mirror
-    $ echo "[ 2 + 2. ] transcribeAndBreak." | ruby mirror.rb
+    $ echo "[ 2 + 2. ] value transcribeAndBreak." | ruby mirror.rb
   
 # Tests
 
