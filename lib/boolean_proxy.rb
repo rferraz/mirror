@@ -2,25 +2,25 @@ class BooleanProxy < Proxy
   
   def if_true(block)
     if delegate
-      block.value 
+      BlockActivation.new(block) 
     else
-      nil
+      self
     end
   end
   
   def if_false(block)
     unless delegate
-      block.value      
+      BlockActivation.new(block)
     else
-      nil
+      self
     end
   end
   
   def if_true_if_false(true_block, false_block)
     if delegate
-      true_block.value
+      BlockActivation.new(true_block)
     else
-      false_block.value
+      BlockActivation.new(false_block)
     end
   end
   

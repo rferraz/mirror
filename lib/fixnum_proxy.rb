@@ -1,13 +1,23 @@
 class FixnumProxy < Proxy
   
-  def down_to_do(lower_bound, block)
-    self.downto(lower_bound) { |i| block.value(i) }
-    self
+  def down_to_do(bound, block)
+    block.returnable_with(:from => self, :to => bound) do
+      if return_stack[:from] >= return_stack[:to]
+        value(return_stack[:from])
+        return_stack[:from] -= 1
+      end
+    end
+    BlockActivation.new(block)
   end
 
-  def to_do(upper_bound, block)
-    self.upto(upper_bound) { |i| block.value(i) }
-    self
+  def to_do(bound, block)
+    block.returnable_with(:from => self, :to => bound) do
+      if return_stack[:from] <= return_stack[:to]
+        value(return_stack[:from])
+        return_stack[:from] += 1
+      end
+    end
+    BlockActivation.new(block)
   end
   
   def sqrt

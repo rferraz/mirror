@@ -59,25 +59,57 @@ module Bytecode
     end
         
   end
+
+  class Store 
   
-  class Block
+    attr_reader :name
     
-    attr_reader :arguments
-    attr_reader :temporaries
-    attr_reader :statements
-    
-    def initialize(arguments, temporaries, statements)
-      @arguments = arguments
-      @temporaries = temporaries
-      @statements = statements
+    def initialize(name)
+      @name = name
     end
     
     def inspect
-      "block [#{@arguments.inspect} : #{@temporaries.inspect}]"
-    end    
+      "store #{@name}"
+    end
     
     def to_sexp
-      [:block, @arguments, @statements.collect(&:to_sexp)]
+      [:store, @name]
+    end
+        
+  end
+  
+  class Return
+    
+    def inspect
+      "return"
+    end
+    
+    def to_sexp
+      [:return]
+    end
+    
+  end
+  
+  class Block
+    
+    attr_reader :arity
+    attr_reader :count
+    attr_reader :arguments
+    attr_reader :temporaries
+    
+    def initialize(arity, count, arguments, temporaries)
+      @arity = arity
+      @count = count
+      @arguments = arguments
+      @temporaries = temporaries
+    end
+    
+    def inspect
+      "block #{@arity} #{@count}"
+    end
+    
+    def to_sexp
+      [:block, @arity, @count]
     end
     
   end

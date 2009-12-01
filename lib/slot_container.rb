@@ -27,21 +27,6 @@ class SlotContainer < BlankObject
     @slots[name.to_sym]
   end
   
-  def perform(message, *args)
-    if has?(message)
-      if self[message].is_a?(BlockContext)
-        self[message].copy.value(*args)
-      else
-        self[message]
-      end
-    elsif has?(unary_name(message.to_s))
-      self[unary_name(message.to_s)] = args.first
-      self[unary_name(message.to_s)]
-    else
-      raise MirrorError.new(self.inspect + " doesn't understand the message " + message)
-    end
-  end
-  
   def inspect
     "<" + @name + ": " + @slots.inspect + ">"
   end

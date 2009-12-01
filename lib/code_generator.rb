@@ -2,6 +2,7 @@ class CodeGenerator
   
   def initialize(ast)
     @ast = ast
+    @scoping = Scoping.new
   end
 
   def generate
@@ -35,21 +36,40 @@ class CodeGenerator
   end
   
   def generate_variable(ast)
-    Bytecode::Load.new(ast.name)
+    if @scoping.in_scope?(ast.name)
+      Bytecode::Load.new(ast.name)
+    else
+      [Bytecode::Implicit.new, Bytecode::Message.new(ast.name)]
+    end
   end
   
   def generate_block(ast)
-    Bytecode::Block.new(ast.arguments, ast.temporaries, ast.statements.collect { |statement| generate_any(statement) }.flatten)
+    @scoping.enter_scope(ast.arguments + ast.temporaries)
+    begin
+      instructions = ast.statements.collect { |statement| generate_any(statement) }.flatten
+    ensure
+      @scoping.leave_scope
+    end
+    instructions.pop
+    [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries)] + instructions + [Bytecode::Return.new]
   end
   
   def generate_message(ast)
-    instructions = []
-    ast.arguments.reverse.each do |argument|
-      instructions += [generate_any(argument)].flatten
+    if ast.target.is_a?(Ast::Implicit) && is_unary?(get_selector_name(ast.selector)) && @scoping.in_scope?(unary_name(get_selector_name(ast.selector)))
+      instructions = []
+      ast.arguments.reverse.each do |argument|
+        instructions += [generate_any(argument)].flatten
+      end
+      instructions + [Bytecode::Store.new(unary_name(get_selector_name(ast.selector)))]
+    else
+      instructions = []
+      ast.arguments.reverse.each do |argument|
+        instructions += [generate_any(argument)].flatten
+      end
+      instructions += [generate_any(ast.target)].flatten
+      instructions << Bytecode::Message.new(ast.selector)
+      instructions
     end
-    instructions += [generate_any(ast.target)].flatten
-    instructions << Bytecode::Message.new(ast.selector)
-    instructions
   end
   
   def generate_implicit(ast)
@@ -58,6 +78,24 @@ class CodeGenerator
   
   def generate_statement(ast)
     ([generate_any(ast.expression)] + [Bytecode::Pop.new]).flatten
+  end
+  
+  protected
+  
+  def is_unary?(name)
+    name =~ /^[a-zA-z]/ && name.count(":") == 1
+  end
+  
+  def unary_name(name)
+    name[0, name.size - 1]
+  end
+  
+  def get_selector_name(selector)
+    if selector == :-
+      selector.to_s
+    else
+      [selector].flatten.collect(&:to_s).join
+    end
   end
     
 end
