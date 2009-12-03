@@ -1,4 +1,4 @@
-# [55]
+# [55, 55]
 
 World mirrorInto: "Fib".
 
@@ -23,4 +23,5 @@ Fib set: "iterativeOf:" to: [ n |
 		].
 ].
 
+World offload: (Fib of: 10).
 (World offload: (Fib iterativeOf: 10)) transcribeAndBreak.

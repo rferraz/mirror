@@ -34,4 +34,8 @@ class FixnumProxy < Proxy
     end
   end
   
+  def inspect
+    delegate.inspect
+  end
+  
 end
