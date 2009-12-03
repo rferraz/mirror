@@ -1,7 +1,7 @@
 class Scoping
   
   def initialize
-    @scopes = []
+    @scopes = [[]]
   end
   
   def enter_scope(variables)
@@ -13,7 +13,7 @@ class Scoping
   end
   
   def in_scope?(variable)
-    @scopes.empty? || @scopes.any? { |scope| scope.include?(variable) }
+    @scopes.any? { |scope| scope.include?(variable) }
   end
   
 end

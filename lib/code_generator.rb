@@ -39,7 +39,7 @@ class CodeGenerator
     if @scoping.in_scope?(ast.name)
       Bytecode::Load.new(ast.name)
     else
-      [Bytecode::Implicit.new, Bytecode::Slot.new(ast.name)]
+      Bytecode::LoadLiteral.new(ast.name)
     end
   end
   

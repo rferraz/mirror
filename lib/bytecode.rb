@@ -60,6 +60,24 @@ module Bytecode
         
   end
 
+  class LoadLiteral
+  
+    attr_reader :name
+    
+    def initialize(name)
+      @name = name
+    end
+    
+    def inspect
+      "load literal #{@name}"
+    end
+    
+    def to_sexp
+      [:load_literal, @name]
+    end
+        
+  end
+  
   class Store 
   
     attr_reader :name

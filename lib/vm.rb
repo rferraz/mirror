@@ -103,6 +103,14 @@ class VM
       return current_context.receiver[name]
     end
   end
+  
+  def load_literal(name)
+    contexts.each do |context|
+      if context.receiver.has?(name)
+        return context.receiver[name]
+      end
+    end
+  end
 
   def store(name, value)
     contexts.each do |context|
@@ -124,24 +132,15 @@ class VM
   end
   
   def send_raw_message(target, instruction)
-    begin
-      value = target.send(instruction.selector_method, *get_arguments(target.method(instruction.selector_method).arity))
-      if value.is_a?(BlockActivation)
-        if value.block.is_returnable?
-          value.block.return
-        else
-          activate_block_context(value.block.receiver || current_context.receiver, value.block)
-        end
+    value = target.send(instruction.selector_method, *get_arguments(target.method(instruction.selector_method).arity))
+    if value.is_a?(BlockActivation)
+      if value.block.is_returnable?
+        value.block.return
       else
-        stack_push_and_wrap(value)
+        activate_block_context(value.block.receiver || current_context.receiver, value.block)
       end
-    rescue
-      contexts.each do |context|
-        if context.receiver.has?(instruction.selector_name)
-          stack_push_and_wrap(context.receiver[instruction.selector_name]) and return
-        end
-      end
-      raise 
+    else
+      stack_push_and_wrap(value)
     end
   end
     
@@ -155,6 +154,8 @@ class VM
       stack_push_and_wrap(instruction.value)
     when Bytecode::Load
       stack_push_and_wrap(load(instruction.name))
+    when Bytecode::LoadLiteral
+      stack_push_and_wrap(load_literal(instruction.name))
     when Bytecode::Store
       stack_push_and_wrap(store(instruction.name, stack.pop))
     when Bytecode::Block
