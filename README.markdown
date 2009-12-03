@@ -23,13 +23,17 @@ Mirror is a toy language I wrote in a couple hours to demonstrate a few tools an
 
 # Requirements
 
-  * Treetop
+* Treetop
+* Not really a requirement, but it runs better on Ruby 1.9
   
 # Running
 
-  Usage is pretty simple:
+Usage is pretty simple:
 
     $ ruby mirror.rb test.mirror
+    
+Or:
+
     $ echo "[ 2 + 2. ] value transcribeAndBreak." | ruby mirror.rb
   
 # Tests
@@ -40,7 +44,7 @@ There are a few tests and test scripts in the _test_ directory.
 
 * Arrays
 * A more specific bytecode syntax
-* A more coherent handling of contexts
+* <strike>A more coherent handling of contexts</strike>
 * Inlining of common sends
 * Code cleanup
 * LLVM
