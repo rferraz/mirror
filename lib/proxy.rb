@@ -1,5 +1,7 @@
 class Proxy < BlankObject
 
+  attr_reader :delegate
+  
   def initialize(vm, delegate)
     @vm = vm
     @delegate = delegate
@@ -20,10 +22,6 @@ class Proxy < BlankObject
   end
   
   protected
-  
-  def delegate
-    @delegate
-  end
   
   def vm
     @vm

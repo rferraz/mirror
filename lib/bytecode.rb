@@ -114,7 +114,7 @@ module Bytecode
     
   end
   
-  class Message
+  class Slot
     
     attr_reader :arity
     attr_reader :selector
@@ -129,11 +129,11 @@ module Bytecode
     end
     
     def inspect
-      "send #{@selector_name}"
+      "slot #{@selector_name}"
     end    
     
     def to_sexp
-      [:send, @selector]
+      [:slot, @selector]
     end
     
     protected

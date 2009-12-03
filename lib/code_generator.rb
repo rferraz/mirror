@@ -39,7 +39,7 @@ class CodeGenerator
     if @scoping.in_scope?(ast.name)
       Bytecode::Load.new(ast.name)
     else
-      [Bytecode::Implicit.new, Bytecode::Message.new(ast.name)]
+      [Bytecode::Implicit.new, Bytecode::Slot.new(ast.name)]
     end
   end
   
@@ -67,7 +67,7 @@ class CodeGenerator
         instructions += [generate_any(argument)].flatten
       end
       instructions += [generate_any(ast.target)].flatten
-      instructions << Bytecode::Message.new(ast.selector)
+      instructions << Bytecode::Slot.new(ast.selector)
       instructions
     end
   end

@@ -124,15 +124,24 @@ class VM
   end
   
   def send_raw_message(target, instruction)
-    value = target.send(instruction.selector_method, *get_arguments(target.method(instruction.selector_method).arity))
-    if value.is_a?(BlockActivation)
-      if value.block.is_returnable?
-        value.block.return
+    begin
+      value = target.send(instruction.selector_method, *get_arguments(target.method(instruction.selector_method).arity))
+      if value.is_a?(BlockActivation)
+        if value.block.is_returnable?
+          value.block.return
+        else
+          activate_block_context(value.block.receiver || current_context.receiver, value.block)
+        end
       else
-        activate_block_context(value.block.receiver || current_context.receiver, value.block)
+        stack_push_and_wrap(value)
       end
-    else
-      stack_push_and_wrap(value)
+    rescue
+      contexts.each do |context|
+        if context.receiver.has?(instruction.selector_name)
+          stack_push_and_wrap(context.receiver[instruction.selector_name]) and return
+        end
+      end
+      raise 
     end
   end
     
@@ -159,7 +168,7 @@ class VM
         stack.pop
         block.return
       end
-    when Bytecode::Message
+    when Bytecode::Slot
       target = stack.pop
       if target.is_a?(World)
         if target.has?(instruction.selector_name)
