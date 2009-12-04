@@ -31,12 +31,4 @@ class SlotContainer < BlankObject
     "<" + @name + ": " + @slots.inspect + ">"
   end
   
-  def is_unary?(name)
-    name =~ /^[a-zA-z]/ && name.count(":") == 1
-  end
-  
-  def unary_name(name)
-    name[0, name.size - 1]
-  end
-  
 end

@@ -178,8 +178,8 @@ class VM
           else
             stack_push_and_wrap(target[instruction.selector_name])
           end
-        elsif target.is_unary?(instruction.selector_name) && target.has?(target.unary_name(instruction.selector_name))
-          target[target.unary_name(instruction.selector_name)] = stack.last          
+        elsif instruction.is_unary? && target.has?(instruction.selector_unary_name)
+          target[instruction.selector_unary_name] = stack.last          
         else
           send_raw_message(target, instruction)
         end

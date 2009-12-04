@@ -134,16 +134,10 @@ module Bytecode
   
   class Slot
     
-    attr_reader :arity
     attr_reader :selector
-    attr_reader :selector_name
-    attr_reader :selector_method
     
     def initialize(selector)
       @selector = selector
-      @selector_name = get_selector_name(selector)
-      @selector_method = get_selector_method(selector)
-      @arity = get_selector_arity(selector)
     end
     
     def inspect
@@ -154,13 +148,33 @@ module Bytecode
       [:slot, @selector]
     end
     
+    def arity
+      @arity ||= get_arity
+    end
+    
+    def is_unary?
+      @is_unary ||= (@selector_name =~ /^[a-zA-z]/ && @selector_name.count(":") == 1)
+    end
+
+    def selector_unary_name
+      @selector_unary_name ||= @selector_name[0, @selector_name.size - 1]
+    end
+    
+    def selector_name
+      @selector_name ||= get_selector_name
+    end
+
+    def selector_method
+      @selector_method ||= get_selector_method
+    end
+
     protected
 
-    def get_selector_arity(selector)
-      if selector.is_a?(Array)
-        selector.size
-      elsif selector.is_a?(String)
-        if selector[selector.size - 1].chr == ":"
+    def get_arity
+      if @selector.is_a?(Array)
+        @selector.size
+      elsif @selector.is_a?(String)
+        if @selector[selector.size - 1].chr == ":"
           1
         else
           0
@@ -170,19 +184,19 @@ module Bytecode
       end
     end
     
-    def get_selector_name(selector)
-      if selector == :-
-        selector.to_s
+    def get_selector_name
+      if @selector == :-
+        @selector.to_s
       else
-        [selector].flatten.collect(&:to_s).join
+        [@selector].flatten.collect(&:to_s).join
       end
     end
 
-    def get_selector_method(selector)
-      if selector == "-"
-        selector.to_s
+    def get_selector_method
+      if @selector == "-"
+        @selector
       else
-        [selector].flatten.collect(&:to_s).collect(&:underscore).join("_").gsub(":", "")
+        [@selector].flatten.collect(&:to_s).collect(&:underscore).join("_").gsub(":", "")
       end
     end
 

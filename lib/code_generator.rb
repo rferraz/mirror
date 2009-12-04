@@ -51,25 +51,23 @@ class CodeGenerator
       @scoping.leave_scope
     end
     instructions.pop
-    [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries)] + instructions + [Bytecode::Return.new]
+    [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries)] + 
+      instructions + [Bytecode::Return.new]
   end
   
   def generate_message(ast)
-    if ast.target.is_a?(Ast::Implicit) && is_unary?(get_selector_name(ast.selector)) && @scoping.in_scope?(unary_name(get_selector_name(ast.selector)))
-      instructions = []
-      ast.arguments.reverse.each do |argument|
-        instructions += [generate_any(argument)].flatten
-      end
-      instructions + [Bytecode::Store.new(unary_name(get_selector_name(ast.selector)))]
+    instructions = []
+    ast.arguments.reverse.each do |argument|
+      instructions += [generate_any(argument)].flatten
+    end    
+    selector_name = get_selector_name(ast.selector)
+    if ast.target.is_a?(Ast::Implicit) && is_unary?(selector_name) && @scoping.in_scope?(unary_name(selector_name))
+      instructions += [Bytecode::Store.new(unary_name(selector_name))]
     else
-      instructions = []
-      ast.arguments.reverse.each do |argument|
-        instructions += [generate_any(argument)].flatten
-      end
       instructions += [generate_any(ast.target)].flatten
       instructions << Bytecode::Slot.new(ast.selector)
-      instructions
     end
+    instructions
   end
   
   def generate_implicit(ast)
