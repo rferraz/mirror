@@ -1,12 +1,20 @@
 class CodeGenerator
   
+  INLINABLE_SELECTORS = [
+    ["ifTrue:"],
+    ["ifFalse:"],
+    ["ifTrue:", "ifFalse:"]
+  ]
+  
   def initialize(ast)
     @ast = ast
     @scoping = Scoping.new
+    @relocated_temporaries = []
+    @block_depth = 0
   end
 
   def generate
-    @ast.collect { |statement| generate_any(statement) }.flatten
+    generate_statements_list(@ast)
   end
   
   def method_missing(method, *args, &block)
@@ -32,53 +40,141 @@ class CodeGenerator
     else
       ast.value
     end
-    Bytecode::Push.new(value)
+    [Bytecode::Push.new(value)]
   end
   
   def generate_variable(ast)
     if @scoping.in_scope?(ast.name)
-      Bytecode::Load.new(ast.name)
+      [Bytecode::Load.new(ast.name)]
     else
-      Bytecode::LoadLiteral.new(ast.name)
+      [Bytecode::LoadLiteral.new(ast.name)]
     end
   end
   
   def generate_block(ast)
-    @scoping.enter_scope(ast.arguments + ast.temporaries)
+    increase_block_depth
     begin
-      instructions = ast.statements.collect { |statement| generate_any(statement) }.flatten
+      @scoping.enter_scope(ast.arguments + ast.temporaries)
+      begin
+        instructions = generate_statements_list(ast.statements)
+      ensure
+        @scoping.leave_scope
+      end
+      instructions.pop
+      additional_temporaries = consume_relocated_temporaries
+      [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries + additional_temporaries)] + 
+        instructions + [Bytecode::Return.new]
     ensure
-      @scoping.leave_scope
+      decrease_block_depth
     end
-    instructions.pop
-    [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries)] + 
-      instructions + [Bytecode::Return.new]
   end
   
   def generate_message(ast)
+    if INLINABLE_SELECTORS.include?(ast.selector)
+      inlined_instructions = inline(ast)
+      return inlined_instructions unless inlined_instructions.empty?
+    end
     instructions = []
     ast.arguments.reverse.each do |argument|
-      instructions += [generate_any(argument)].flatten
+      instructions += generate_any(argument)
     end    
     selector_name = get_selector_name(ast.selector)
     if ast.target.is_a?(Ast::Implicit) && is_unary?(selector_name) && @scoping.in_scope?(unary_name(selector_name))
       instructions += [Bytecode::Store.new(unary_name(selector_name))]
     else
-      instructions += [generate_any(ast.target)].flatten
+      instructions += generate_any(ast.target)
       instructions << Bytecode::Slot.new(ast.selector)
     end
     instructions
   end
   
   def generate_implicit(ast)
-    Bytecode::Implicit.new
+    [Bytecode::Implicit.new]
   end
   
   def generate_statement(ast)
-    ([generate_any(ast.expression)] + [Bytecode::Pop.new]).flatten
+    generate_any(ast.expression) + [Bytecode::Pop.new]
   end
   
-  protected
+  def increase_block_depth
+    @block_depth += 1
+  end
+
+  def decrease_block_depth
+    @block_depth -= 1    
+  end
+  
+  def get_block_depth
+    @block_depth
+  end
+  
+  def relocate_temporaries(temporaries)
+    @relocated_temporaries << [get_block_depth, temporaries]
+  end
+  
+  def consume_relocated_temporaries
+    partitioned_temporaries = @relocated_temporaries.partition { |temporaries| temporaries.first >= get_block_depth }
+    @relocated_temporaries = partitioned_temporaries.last
+    partitioned_temporaries.first.collect(&:last).flatten
+  end
+  
+  def inline(ast)
+    case ast.selector
+    when ["ifTrue:"]
+      inline_simple_if(ast, true)
+    when ["ifFalse:"]
+      inline_simple_if(ast, false)
+    when ["ifTrue:", "ifFalse:"]
+      inline_full_if(ast)
+    else
+      []
+    end
+  end
+  
+  def inline_simple_if(ast, for_true)
+    block = ast.arguments.first
+    if block.is_a?(Ast::Block)
+      relocate_temporaries(block.temporaries) unless block.temporaries.empty?
+      block_instructions = inline_block(block)
+      jump_instruction = for_true ? Bytecode::JumpFalse.new(block_instructions.size) : Bytecode::JumpTrue.new(block_instructions.size)
+      generate_any(ast.target) + [jump_instruction] + block_instructions
+    else
+      []
+    end
+  end
+
+  def inline_full_if(ast)
+    true_block = ast.arguments.first
+    false_block = ast.arguments.last
+    if true_block.is_a?(Ast::Block) && false_block.is_a?(Ast::Block)
+      true_block_instructions = inline_block(true_block)
+      false_block_instructions = inline_block(false_block)
+      generate_any(ast.target) + 
+        [Bytecode::JumpFalse.new(true_block_instructions.size + 1)] + 
+        true_block_instructions +
+        [Bytecode::Jump.new(false_block_instructions.size)] + 
+        false_block_instructions
+    else
+      []
+    end
+  end
+  
+  def inline_block(block)
+    instructions = []
+    @scoping.enter_scope(block.arguments + block.temporaries)
+    begin
+      relocate_temporaries(block.temporaries) unless block.temporaries.empty?
+      instructions += block.statements.collect { |statement| generate_any(statement) }.flatten
+    ensure
+      @scoping.leave_scope
+    end
+    instructions.pop
+    instructions
+  end
+  
+  def generate_statements_list(statements)
+    statements.inject([]) { |memo, statement| memo += generate_any(statement) ; memo }
+  end
   
   def is_unary?(name)
     name =~ /^[a-zA-z]/ && name.count(":") == 1

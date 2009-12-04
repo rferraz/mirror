@@ -158,6 +158,12 @@ class VM
       stack_push_and_wrap(load_literal(instruction.name))
     when Bytecode::Store
       stack_push_and_wrap(store(instruction.name, stack.pop))
+    when Bytecode::Jump
+      jump(instruction.count)
+    when Bytecode::JumpFalse
+      jump(instruction.count) unless stack.pop.delegate
+    when Bytecode::JumpTrue
+      jump(instruction.count) if stack.pop.delegate
     when Bytecode::Block
       stack_push_and_wrap(BlockFrame.new(self, instruction.arity, ip, instruction.arguments, instruction.temporaries))
       jump(instruction.count)

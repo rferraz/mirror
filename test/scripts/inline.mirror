@@ -1,0 +1,15 @@
+# ["ok"]
+
+World mirrorInto: "Inline".
+
+Inline set: "test" to: [
+	1 == 1 ifTrue: [
+		1 == 1 ifTrue: [
+			1 == 1 ifTrue: [ : ok |
+				ok: "ok".
+			]. 
+		]. 
+	]. 
+].
+
+(World offload: Inline test) transcribeAndBreak.

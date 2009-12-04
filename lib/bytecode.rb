@@ -141,7 +141,7 @@ module Bytecode
     end
     
     def inspect
-      "slot #{@selector_name}"
+      "slot #{selector_name}"
     end    
     
     def to_sexp
@@ -201,5 +201,59 @@ module Bytecode
     end
 
   end
+  
+  class Jump
+    
+    attr_reader :count
+    
+    def initialize(count)
+      @count = count
+    end
+    
+    def inspect
+      "jump #{@count}"
+    end
+    
+    def to_sexp
+      [:jump, @count]
+    end
+    
+  end
+    
+  class JumpFalse
+    
+    attr_reader :count
+    
+    def initialize(count)
+      @count = count
+    end
+    
+    def inspect
+      "jump false #{@count}"
+    end
+    
+    def to_sexp
+      [:jump_false, @count]
+    end
+    
+  end
+  
+  class JumpTrue
+    
+    attr_reader :count
+    
+    def initialize(count)
+      @count = count
+    end
+    
+    def inspect
+      "jump true #{@count}"
+    end
+    
+    def to_sexp
+      [:jump_true, @count]
+    end
+    
+  end  
   
 end
