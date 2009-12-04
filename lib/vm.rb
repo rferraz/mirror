@@ -110,6 +110,7 @@ class VM
         return context.receiver[name]
       end
     end
+    raise current_context.receiver.inspect + " doesn't understand " + name
   end
 
   def store(name, value)
