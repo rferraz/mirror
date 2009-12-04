@@ -43,10 +43,16 @@ There are a few tests and test scripts in the _test_ directory.
 # TO DO
 
 * Arrays
-* A more specific bytecode syntax
+* <strike>A more specific bytecode syntax</strike>
 * <strike>A more coherent handling of contexts</strike>
 * Inlining of common sends
-* Code cleanup
+	* <strike>ifTrue:</strike>
+	* <strike>ifFalse:</strike>
+	* <strike>ifTrue:ifFalse:</strike>
+	* to:do:
+	* downTo:do:
+	* Binary primitives: +, -, *, /, etc
+* <strike>Code cleanup</strike>
 * LLVM
   
 [1]: http://www.smalltalk.org/
