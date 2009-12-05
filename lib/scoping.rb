@@ -1,7 +1,7 @@
 class Scoping
   
   def initialize
-    @scopes = [[]]
+    @scopes = []
   end
   
   def enter_scope(variables)
