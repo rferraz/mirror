@@ -57,10 +57,10 @@ class CodeGenerator
       @scoping.enter_scope(ast.arguments + ast.temporaries)
       begin
         instructions = generate_statements_list(ast.statements)
+        instructions.pop
       ensure
         @scoping.leave_scope
       end
-      instructions.pop
       additional_temporaries = consume_relocated_temporaries
       [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries + additional_temporaries)] + 
         instructions + [Bytecode::Return.new]
@@ -160,16 +160,15 @@ class CodeGenerator
   end
   
   def inline_block(block)
-    instructions = []
     @scoping.enter_scope(block.arguments + block.temporaries)
     begin
       relocate_temporaries(block.temporaries) unless block.temporaries.empty?
-      instructions += block.statements.collect { |statement| generate_any(statement) }.flatten
+      instructions = generate_statements_list(block.statements)
+      instructions.pop
+      instructions
     ensure
       @scoping.leave_scope
     end
-    instructions.pop
-    instructions
   end
   
   def generate_statements_list(statements)
