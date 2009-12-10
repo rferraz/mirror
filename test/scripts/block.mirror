@@ -1,4 +1,4 @@
-# [3, 5, 7, 9, 11, 13, 15]
+# [3, 5, 7, 9, 11, 13, 15, 1, 1]
 
 World mirrorInto: "BlockTest".
 
@@ -89,3 +89,20 @@ World offload: (BlockTest testD).
 World offload: (BlockTest testE).
 World offload: (BlockTest testF).
 World offload: (BlockTest testG).
+
+# Block context should be valid for slots as well
+
+World mirrorInto: "SlotTest".
+
+SlotTest set: "a:" to: [ a : b |
+	b: a + 2.
+	SlotTest set: "b:" to: [ c |
+		b + c.
+	].
+].
+
+SlotTest a: 2.
+World offload: (SlotTest b: -3).
+
+SlotTest a: 3.
+World offload: (SlotTest b: -4).

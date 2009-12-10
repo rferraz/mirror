@@ -20,10 +20,6 @@ class BlockFrame
     @return_stack = nil
   end
   
-  def un_home
-    @home_context = nil
-  end
-  
   def is_returnable?
     !@return_block.nil?
   end
@@ -35,10 +31,6 @@ class BlockFrame
   
   def return
     instance_eval(&@return_block)
-  end
-  
-  def cancel_return
-    @return_block = nil
   end
   
   def value(*arguments)

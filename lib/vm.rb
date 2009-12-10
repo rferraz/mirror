@@ -94,10 +94,8 @@ class VM
   end
   
   def load(name)
-    if current_context.block.home_context
-      if current_context.block.home_context.has_local?(name)
-        return current_context.block.home_context.get_local(name)
-      end
+    if current_context.block.home_context.has_local?(name)
+      return current_context.block.home_context.get_local(name)
     end
     contexts.each do |context|
       if context.has_local?(name)
@@ -119,10 +117,8 @@ class VM
   end
 
   def store(name, value)
-    if current_context.block.home_context
-      if current_context.block.home_context.has_local?(name)
-        return current_context.block.home_context.set_local(name, value)
-      end
+    if current_context.block.home_context.has_local?(name)
+      return current_context.block.home_context.set_local(name, value)
     end
     contexts.each do |context|
       if context.has_local?(name)
@@ -191,7 +187,6 @@ class VM
       if target.is_a?(World)
         if target.has?(instruction.selector_name)
           if target[instruction.selector_name].is_a?(BlockFrame)
-            target[instruction.selector_name].un_home
             activate_block_context(target, target[instruction.selector_name])
           else
             stack_push_and_wrap(target[instruction.selector_name])
