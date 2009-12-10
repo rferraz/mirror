@@ -9,8 +9,6 @@ class CodeGenerator
   def initialize(ast)
     @ast = ast
     @scoping = Scoping.new
-    @relocated_temporaries = []
-    @block_depth = 0
   end
 
   def generate
@@ -52,21 +50,18 @@ class CodeGenerator
   end
   
   def generate_block(ast)
-    increase_block_depth
+    reset_relocated_temporaries if @scoping.is_root?
+    @scoping.enter_scope(ast.arguments + ast.temporaries)
     begin
-      @scoping.enter_scope(ast.arguments + ast.temporaries)
-      begin
-        instructions = generate_statements_list(ast.statements)
-        instructions.pop
-      ensure
-        @scoping.leave_scope
-      end
-      additional_temporaries = consume_relocated_temporaries
-      [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, ast.temporaries + additional_temporaries)] + 
-        instructions + [Bytecode::Return.new]
+      instructions = generate_statements_list(ast.statements)
+      instructions.pop
     ensure
-      decrease_block_depth
+      @scoping.leave_scope
     end
+    relocate_temporaries(ast.temporaries) unless ast.temporaries.empty?
+    temporaries = @scoping.is_root? ? get_relocated_temporaries : []
+    [Bytecode::Block.new(ast.arguments.size, instructions.size + 1, ast.arguments, temporaries)] + 
+      instructions + [Bytecode::Return.new]
   end
   
   def generate_message(ast)
@@ -96,28 +91,6 @@ class CodeGenerator
     generate_any(ast.expression) + [Bytecode::Pop.new]
   end
   
-  def increase_block_depth
-    @block_depth += 1
-  end
-
-  def decrease_block_depth
-    @block_depth -= 1    
-  end
-  
-  def get_block_depth
-    @block_depth
-  end
-  
-  def relocate_temporaries(temporaries)
-    @relocated_temporaries << [get_block_depth, temporaries]
-  end
-  
-  def consume_relocated_temporaries
-    partitioned_temporaries = @relocated_temporaries.partition { |temporaries| temporaries.first >= get_block_depth }
-    @relocated_temporaries = partitioned_temporaries.last
-    partitioned_temporaries.first.collect(&:last).flatten
-  end
-  
   def inline(ast)
     case ast.selector
     when ["ifTrue:"]
@@ -134,7 +107,6 @@ class CodeGenerator
   def inline_simple_if(ast, for_true)
     block = ast.arguments.first
     if block.is_a?(Ast::Block)
-      relocate_temporaries(block.temporaries) unless block.temporaries.empty?
       block_instructions = inline_block(block)
       jump_instruction = for_true ? Bytecode::JumpFalse.new(block_instructions.size) : Bytecode::JumpTrue.new(block_instructions.size)
       generate_any(ast.target) + [jump_instruction] + block_instructions
@@ -160,15 +132,8 @@ class CodeGenerator
   end
   
   def inline_block(block)
-    @scoping.enter_scope(block.arguments + block.temporaries)
-    begin
-      relocate_temporaries(block.temporaries) unless block.temporaries.empty?
-      instructions = generate_statements_list(block.statements)
-      instructions.pop
-      instructions
-    ensure
-      @scoping.leave_scope
-    end
+    instructions = generate_any(block)
+    instructions[1, instructions.size - 2]
   end
   
   def generate_statements_list(statements)
@@ -190,5 +155,17 @@ class CodeGenerator
       [selector].flatten.collect(&:to_s).join
     end
   end
-    
+
+  def relocate_temporaries(temporaries)
+    @relocated_temporaries += temporaries
+  end
+  
+  def get_relocated_temporaries
+    @relocated_temporaries
+  end
+  
+  def reset_relocated_temporaries
+    @relocated_temporaries = []
+  end
+      
 end

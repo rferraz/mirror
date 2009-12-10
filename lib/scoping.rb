@@ -16,4 +16,8 @@ class Scoping
     @scopes.any? { |scope| scope.include?(variable) }
   end
   
+  def is_root?
+    @scopes.empty?
+  end
+  
 end
