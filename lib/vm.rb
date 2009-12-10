@@ -190,6 +190,8 @@ class VM
         else
           send_raw_message(target, instruction)
         end
+      elsif target.is_a?(BlockFrame) && instruction.selector == "value"
+        target.value(*get_arguments(target.arity))
       else
         send_raw_message(target, instruction)
       end

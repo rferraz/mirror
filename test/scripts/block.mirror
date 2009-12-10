@@ -1,0 +1,14 @@
+# [4, 4]
+
+World mirrorInto: "BlockTest".
+
+BlockTest set: "testA" to: [
+  [ 2 + 2. ] value.
+].
+
+BlockTest set: "testB:" to: [ a |
+  [ 2 + a. ] value.
+].
+
+World offload: (BlockTest testA).
+World offload: (BlockTest testB: 2).
