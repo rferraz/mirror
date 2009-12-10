@@ -119,6 +119,11 @@ class VM
   end
 
   def store(name, value)
+    if current_context.block.home_context
+      if current_context.block.home_context.has_local?(name)
+        return current_context.block.home_context.set_local(name, value)
+      end
+    end
     contexts.each do |context|
       if context.has_local?(name)
         return context.set_local(name, value)

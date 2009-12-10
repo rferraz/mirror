@@ -24,6 +24,10 @@ class BlockContext
     @reference_arguments[name] = value
   end
   
+  def inspect
+    "<BlockFrame: " + receiver.inspect + ">"
+  end
+  
   protected
   
   def initialize_reference_arguments

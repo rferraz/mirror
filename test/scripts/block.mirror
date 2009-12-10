@@ -1,4 +1,4 @@
-# [3, 5, 7, 9, 11, 13]
+# [3, 5, 7, 9, 11, 13, 15]
 
 World mirrorInto: "BlockTest".
 
@@ -70,9 +70,22 @@ BlockTest set: "testF" to: [ : b |
   (BlockTest helperFb: 7) value value.
 ].
 
+# Block as argument bound to previous context with local variable
+
+BlockTest set: "helperG" to: [ : a b |
+	a: 7.
+	b: 7.
+  [ :c | c: 1. a + b + c. ].
+].
+
+BlockTest set: "testG" to: [
+  (BlockTest helperG) value.
+].
+
 World offload: (BlockTest testA).
 World offload: (BlockTest testB).
 World offload: (BlockTest testC).
 World offload: (BlockTest testD).
 World offload: (BlockTest testE).
 World offload: (BlockTest testF).
+World offload: (BlockTest testG).
