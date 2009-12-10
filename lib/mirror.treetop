@@ -76,12 +76,20 @@ grammar Mirror
   end
   
   rule decimal
-    integer period integer <DecimalLiteral>
+    sign? digits period digits <DecimalLiteral>
   end
   
   rule integer
-    digit+ <IntegerLiteral>
+    sign? digits <IntegerLiteral>
   end
+
+	rule sign
+		"-"
+	end
+	
+	rule digits
+		digit+
+	end
     
   rule string_literal
     (quote (!quote .)* quote)+ <StringLiteral>
