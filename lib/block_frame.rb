@@ -6,9 +6,11 @@ class BlockFrame
   attr_reader :temporaries
   
   attr_accessor :receiver
+  attr_accessor :home_context
   
-  def initialize(vm, arity, ip, arguments, temporaries)
+  def initialize(vm, home_context, arity, ip, arguments, temporaries)
     @vm = vm
+    @home_context = home_context
     @arity = arity
     @ip = ip
     @arguments = arguments
@@ -16,6 +18,10 @@ class BlockFrame
     @receiver = nil
     @return_block = nil
     @return_stack = nil
+  end
+  
+  def un_home
+    @home_context = nil
   end
   
   def is_returnable?

@@ -94,6 +94,11 @@ class VM
   end
   
   def load(name)
+    if current_context.block.home_context
+      if current_context.block.home_context.has_local?(name)
+        return current_context.block.home_context.get_local(name)
+      end
+    end
     contexts.each do |context|
       if context.has_local?(name)
         return context.get_local(name)
@@ -166,7 +171,7 @@ class VM
     when Bytecode::JumpTrue
       jump(instruction.count) if stack.pop.delegate
     when Bytecode::Block
-      stack_push_and_wrap(BlockFrame.new(self, instruction.arity, ip, instruction.arguments, instruction.temporaries))
+      stack_push_and_wrap(BlockFrame.new(self, current_context, instruction.arity, ip, instruction.arguments, instruction.temporaries))
       jump(instruction.count)
     when Bytecode::Return
       block = current_context.block
@@ -181,6 +186,7 @@ class VM
       if target.is_a?(World)
         if target.has?(instruction.selector_name)
           if target[instruction.selector_name].is_a?(BlockFrame)
+            target[instruction.selector_name].un_home
             activate_block_context(target, target[instruction.selector_name])
           else
             stack_push_and_wrap(target[instruction.selector_name])

@@ -1,14 +1,78 @@
-# [4, 4]
+# [3, 5, 7, 9, 11, 13]
 
 World mirrorInto: "BlockTest".
 
+# Common block call
+
 BlockTest set: "testA" to: [
-  [ 2 + 2. ] value.
+  [ 1 + 2. ] value.
 ].
 
-BlockTest set: "testB:" to: [ a |
+# Block as argument without bindings
+
+BlockTest set: "helperB:" to: [ a |
   [ 2 + a. ] value.
 ].
 
+BlockTest set: "testB" to: [
+  BlockTest helperB: 3.
+].
+
+# Block as argument bound to previous context
+
+BlockTest set: "helperC" to: [ : a |
+  a: 4.
+  [ 3 + a. ].
+].
+
+BlockTest set: "testC" to: [
+  BlockTest helperC value.
+].
+
+# Block as argument bound to previous context and argument
+
+BlockTest set: "helperD:" to: [ a : b |
+  b: 4.
+  [ a + b. ].
+].
+
+BlockTest set: "testD" to: [
+  (BlockTest helperD: 5) value.
+].
+
+# Block as argument bound to previous context and argument 
+# with shadowing
+
+BlockTest set: "helperE:" to: [ a : b |
+  b: 5.
+  [ a + b. ].
+].
+
+BlockTest set: "testE" to: [ : b |
+  b: 1.
+  (BlockTest helperE: 6) value.
+].
+
+# Block as argument bound to multiple previous contexts and arguments
+# with shadowing
+
+BlockTest set: "helperFa:" to: [ a : b |
+  b: 6.
+  [ a + b. ].
+].
+
+BlockTest set: "helperFb:" to: [ a |
+  [ BlockTest helperFa: a. ].
+].
+
+BlockTest set: "testF" to: [ : b |
+  b: 1.
+  (BlockTest helperFb: 7) value value.
+].
+
 World offload: (BlockTest testA).
-World offload: (BlockTest testB: 2).
+World offload: (BlockTest testB).
+World offload: (BlockTest testC).
+World offload: (BlockTest testD).
+World offload: (BlockTest testE).
+World offload: (BlockTest testF).
