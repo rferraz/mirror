@@ -140,7 +140,43 @@ class VM
   end
   
   def handle_primitive(target, instruction)
-    false
+    case instruction.selector_name
+    when "+"
+      stack.push(target + stack.pop)
+      true
+    when "-"
+      stack.push(target - stack.pop)
+      true
+    when "*"
+      stack.push(target * stack.pop)
+      true
+    when "/"
+       stack.push(target / stack.pop)
+       true
+    when ">"
+      stack.push(target > stack.pop)
+      true
+    when ">="
+      stack.push(target >= stack.pop)
+      true
+    when "<"
+      stack.push(target < stack.pop)
+      true
+    when "<="
+      stack.push(target <= stack.pop)
+      true
+    when "%"
+      stack.push(target % stack.pop)
+      true
+    when "^"
+      stack.push(target ^ stack.pop)
+      true
+    when "="
+      stack.push(target == stack.pop)
+      true
+    else
+      false
+    end
   end
     
   def execute(instruction)
@@ -191,7 +227,9 @@ class VM
       elsif target.is_a?(BlockFrame) && instruction.selector == "value"
         target.value(*get_arguments(target.arity))
       else
-        send_raw_message(target, instruction)
+        unless handle_primitive(target, instruction)
+          send_raw_message(target, instruction)
+        end
       end
     else
       raise "Unknown instruction " + instruction.class.name.to_s
