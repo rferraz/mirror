@@ -26,7 +26,7 @@ class VM
   
   def activate_block(block, arguments)
     arguments.reverse.each do |argument|
-      stack_push_and_wrap(argument)
+      stack.push(argument)
     end
     activate_block_context(current_context.receiver, block)
   end
@@ -80,19 +80,7 @@ class VM
   def leave_context
     @contexts.shift
   end
-  
-  def stack_push_and_wrap(value)
-    if value.is_a?(TrueClass) || value.is_a?(FalseClass)
-      stack.push(BooleanProxy.new(self, value))
-    elsif value.is_a?(Fixnum)
-      stack.push(FixnumProxy.new(self, value))
-    elsif value.is_a?(Float)
-      stack.push(FloatProxy.new(self, value))
-    else
-      stack.push(value)
-    end
-  end
-  
+    
   def load(name)
     if current_context.block.home_context.has_local?(name)
       return current_context.block.home_context.get_local(name)
@@ -147,32 +135,36 @@ class VM
         activate_block_context(value.block.receiver || current_context.receiver, value.block)
       end
     else
-      stack_push_and_wrap(value)
+      stack.push(value)
     end
+  end
+  
+  def handle_primitive(target, instruction)
+    false
   end
     
   def execute(instruction)
     case instruction
     when Bytecode::Implicit
-      stack_push_and_wrap(current_context.receiver)
+      stack.push(current_context.receiver)
     when Bytecode::Pop
       stack.pop
     when Bytecode::Push
-      stack_push_and_wrap(instruction.value)
+      stack.push(instruction.value)
     when Bytecode::Load
-      stack_push_and_wrap(load(instruction.name))
+      stack.push(load(instruction.name))
     when Bytecode::LoadLiteral
-      stack_push_and_wrap(load_literal(instruction.name))
+      stack.push(load_literal(instruction.name))
     when Bytecode::Store
-      stack_push_and_wrap(store(instruction.name, stack.pop))
+      stack.push(store(instruction.name, stack.pop))
     when Bytecode::Jump
       jump(instruction.count)
     when Bytecode::JumpFalse
-      jump(instruction.count) unless stack.pop.delegate
+      jump(instruction.count) unless stack.pop
     when Bytecode::JumpTrue
-      jump(instruction.count) if stack.pop.delegate
+      jump(instruction.count) if stack.pop
     when Bytecode::Block
-      stack_push_and_wrap(BlockFrame.new(self, current_context, instruction.arity, ip, instruction.arguments, instruction.temporaries))
+      stack.push(BlockFrame.new(self, current_context, instruction.arity, ip, instruction.arguments, instruction.temporaries))
       jump(instruction.count)
     when Bytecode::Return
       block = current_context.block
@@ -189,7 +181,7 @@ class VM
           if target[instruction.selector_name].is_a?(BlockFrame)
             activate_block_context(target, target[instruction.selector_name])
           else
-            stack_push_and_wrap(target[instruction.selector_name])
+            stack.push(target[instruction.selector_name])
           end
         elsif instruction.is_unary? && target.has?(instruction.selector_unary_name)
           target[instruction.selector_unary_name] = stack.last          
