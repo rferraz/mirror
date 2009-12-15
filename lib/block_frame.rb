@@ -18,10 +18,19 @@ class BlockFrame
     @receiver = nil
     @return_block = nil
     @return_stack = nil
+    @return_self = false
   end
   
   def is_returnable?
     !@return_block.nil?
+  end
+  
+  def return_self
+    @return_self = true
+  end
+  
+  def return_self?
+    @return_self
   end
   
   def returnable_with(arguments = {}, &block)

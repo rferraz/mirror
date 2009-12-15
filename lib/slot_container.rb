@@ -31,4 +31,8 @@ class SlotContainer < BlankObject
     "<" + @name + ": " + @slots.inspect + ">"
   end
   
+  def to_s
+    inspect
+  end
+  
 end

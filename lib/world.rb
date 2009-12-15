@@ -9,6 +9,12 @@ class World < SlotContainer
     BlockActivation.new(block)
   end
   
+  def with(block)
+    block.receiver = World.new(vm, "Anonymous", @slots.dup)
+    block.return_self
+    BlockActivation.new(block)
+  end
+  
   def offload(value)
     vm.universe.offload(value)
     value

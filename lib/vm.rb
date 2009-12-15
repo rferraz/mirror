@@ -210,6 +210,10 @@ class VM
         stack.pop
         block.return
       end
+      if block.return_self?
+        stack.pop
+        stack.push(block.receiver)
+      end
     when Bytecode::Slot
       target = stack.pop
       if target.is_a?(World)

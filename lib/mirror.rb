@@ -6,7 +6,6 @@ require "treetop"
 
 Treetop.load File.join(libdir, "mirror.treetop")
 
-require "extensions"
 require "mirror_extensions"
 require "blank_object"
 require "slot_container"
@@ -22,3 +21,4 @@ require "bytecode"
 require "code_generator"
 require "vm"
 require "interpreter"
+require "extensions"
